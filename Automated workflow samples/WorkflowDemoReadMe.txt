@@ -1,4 +1,4 @@
-The following files are used to demonstrate direct access to protected data.  They utilize the SmartFile Script Engine; however, the behavior can be replicated using the native SmartFile API.
+The following files are used to demonstrate direct access to protected data (without unprotecting the full UXP file).  They utilize the UXL Script Engine; however, the behavior can be replicated using the native UXP API.
 
 Workflow.data               - Sample data ... a file of transaction records that can be accessed by record #.
 Workflow.kcl                - Native KCL file used to create a UXP.
@@ -13,7 +13,7 @@ The base Workflow.data contains 501 records.  By utilizing a multiplier, one can
 set that is 'N' times larger than the original sample.  For example, by using a multiplier of 2, the
 resultant sample set will contain 1002 records.
 
-To get started, run the SmartFile Script Engine.  At the prompt, type:
+To get started, run the UXL Script Engine.  At the prompt, type:
 
   x::cd("the folder containing the above workflow demo files");
 
