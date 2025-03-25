@@ -1,0 +1,19 @@
+/*!
+    \copyright Sertainty Corporation, 2020.  All Rights Reserved.
+
+    \file     helloworld.uxl
+    
+    \brief    This sample demonstrates the initialize library call necessary before any UXP Identity or UXP Object functions can be called.
+
+    
+    \author   Melvin Valdez de la Roca
+    \date     06/22/2020
+
+    \note
+ */
+
+printf("\nHello, Sertainty!!\nYou have a valid license. Try out other samples.\n");
+
+printf("\nSample finished running\n");
+
+return 0;

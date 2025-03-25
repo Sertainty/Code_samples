@@ -1,0 +1,813 @@
+/*!
+ \copyright Sertainty Corporation, 2021. All Rights Reserved.
+ 
+ \file     6-delegate_add_subscribers.uxl
+ 
+ \brief    This sample code opens the newly created database and adds the Subscribers.
+ 
+ \author   Melvin Valdez de la Roca
+ \date     03/08/2021
+ 
+ \note     Application expects to find the necessary source files in the current working folder.
+ */
+
+/*
+ dl::subscribe
+ dl::unsubscribe
+ dl::getSubscribers
+ dl::getSubscription
+ dl::getSubscriptions
+ dl::updateSubscription
+ */
+
+replace procedure subscribers()
+{
+  table table;
+  string user_main = "SampleUser@myemail.com";
+  string user1 = "SampleUser1@myemail.com";
+  string user2 = "SampleUser2@myemail.com";
+  string delegate1 = "Delegate_1";
+  string delegate2 = "Delegate_2";
+  string filter;
+  int session;
+  int a, b, c, d, i, j, k, delegateExists, subscriptionExists, subscriptionList_Exist;
+  list userlist, delegatelist, subscriberlist, subscriptionlist;
+  
+  on return
+  {
+    ds::closeSession(session);
+    ds::closeDatabase();
+  }
+  
+  table = table::create();
+  
+  /* Open Database */
+  
+  lib = ds::openDatabase(0);
+  if (errorstring)
+  {
+    printf("Error opening data services database: %1\n", errorstring);
+    return;
+  }
+  else
+  {
+    printf("\nOpened Database");
+  }
+  
+  /* Open Session */
+  
+  session = ds::openSession(user_main);
+  if (errorstring)
+  {
+    printf("Error opening session for data services database: %1\n", errorstring);
+    return;
+  }
+  else
+  {
+    printf("\nOpened Session\n");
+  }
+  
+  authenticate_dsdb_auto(session, user_main);
+  
+  printf("\n- - - GET SUBSCRIBERS (BEFORE CHANGES) - - -\n");
+  
+  ds::getUsers(session, filter, &userlist);
+  
+  for (i = 0; i < countList(userlist); i++)
+  {
+    dl::getDelegates(session, getList(userlist,i), &delegatelist);
+
+    if (countList(delegatelist) > 0)
+    {
+      for (j = 0; j < countList(delegatelist); j++)
+      {
+        delegateExists = dl::getDelegate(session, getList(userlist,i),
+                                         getList(delegatelist, j), table);
+        if (delegateExists == 1)
+        {
+          printf("\nDelegate: [%1]\n", getList(delegatelist, j));
+          
+          dl::getSubscribers(session,
+                             getList(userlist,i),
+                             getList(delegatelist, j),
+                             filter,
+                             &subscriberlist);
+          
+          if (countList(subscriberlist) > 0)
+          {
+            for (k = 0; k < countList(subscriberlist); k++)
+            {
+              subscriptionExists = dl::getSubscription(session, getList(userlist,i),
+                                                       getList(delegatelist, j),
+                                                       getList(subscriberlist, k),
+                                                       table);
+              if (subscriptionExists == 1)
+              {
+                printf("\n\tSubscriber: [%1]\n", getList(subscriberlist, k));
+                printf("\n\texpiration = %1\n", table::get(table, "expiration"));
+                printf("\n\tpermit_offline = %1\n", table::get(table, "permit_offline"));
+                printf("\n\toffline_duration = %1\n", table::get(table, "offline_duration"));
+                printf("\n\taccess_max = %1\n", table::get(table, "access_max"));
+                printf("\n\taccess_count = %1\n", table::get(table, "access_count"));
+              }
+              else
+              {
+                printf("\nSubscription '%1' does not exist!\n", getList(subscriberlist, k));
+              }
+            }
+          }
+          else
+          {
+            printf("\n\t- No Subscribers exist\n");
+          }
+        }
+        else
+        {
+          printf("\nDelegate '%1' does not exist!\n", getList(delegatelist, j));
+        }
+      }
+    }
+    else
+    {
+      //printf("\n- No Delegates exist\n");
+    }
+  }
+  printf("\n- - - - - - - - - - - - - - - - - - - - -\n");
+  
+  printf("\n- - - GET SUBSCRIPTIONS (BEFORE CHANGES) - - -\n");
+  
+  for (i = 0; i < countList(userlist); i++)
+  {
+    subscriptionList_Exist = dl::getSubscriptions(session, getList(userlist,i), &subscriptionlist);
+    
+    printf("\nUser: [%1]\n", getList(userlist,i));
+    
+    if (countList(subscriptionlist) > 0)
+    {
+      print(subscriptionlist);
+    }
+    else
+    {
+      printf("- User is not subscribed to any Delegates\n");
+    }
+  }
+  
+  printf("\n- - - - - - - - - - - - - - - - - - - - -\n");
+  
+  printf("\nSUBSCRIBING USERS\n");
+  
+  /* Subscribing SampleUser1@myemail.com to Delegate_1 */
+  
+  table::clear(table);
+  table::set(table, "expiration", 0);
+  table::set(table, "permit_offline", 1);
+  table::set(table, "offline_duration", 24);
+  table::set(table, "access_max", 0);
+  table::set(table, "flags", 1);
+
+  a = dl::subscribe(session, user_main, delegate1, user1, table);
+  if (a == 1)
+  {
+    printf("- Subscribed [%1] to [%2]\n", user1, delegate1);
+  }
+  else
+  {
+    printf("- Error: Could not subscribe [%1] to [%2]\n", user1, delegate1);
+    return;
+  }
+  
+  /* Subscribing SampleUser2@myemail.com to Delegate_1 */
+  
+  table::clear(table);
+  table::set(table, "expiration", 0);
+  table::set(table, "permit_offline", 1);
+  table::set(table, "offline_duration", 24);
+  table::set(table, "access_max", 0);
+  table::set(table, "flags", 1);
+
+  a = dl::subscribe(session, user_main, delegate2, user2, table);
+  if (a == 1)
+  {
+    printf("- Subscribed [%1] to [%2]\n", user2, delegate2);
+  }
+  else
+  {
+    printf("- Error: Could not subscribe [%1] to [%2]\n", user2, delegate2);
+    return;
+  }
+  
+  printf("\nATTEMPTING TO ADD SAME SUBSCRIBER ...\n");
+  
+  table::clear(table);
+  table::set(table, "expiration", 0);
+  table::set(table, "permit_offline", 1);
+  table::set(table, "offline_duration", 24);
+  table::set(table, "access_max", 0);
+  table::set(table, "flags", 1);
+
+  a = dl::subscribe(session, user_main, delegate1, user1, table);
+  if (a == 1)
+  {
+    printf("- User [%1] subscribed to Delegate [%2]\n", user1, delegate1);
+  }
+  else
+  {
+    printf("- Error subscribing user\n");
+  }
+  
+  clearList(subscriberlist);
+  
+  printf("\n- - - GET SUBSCRIBERS (AFTER CHANGES) - - -\n");
+  
+  ds::getUsers(session, filter, &userlist);
+  
+  for (i = 0; i < countList(userlist); i++)
+  {
+    dl::getDelegates(session, getList(userlist,i), &delegatelist);
+    
+    if (countList(delegatelist) > 0)
+    {
+      for (j = 0; j < countList(delegatelist); j++)
+      {
+        delegateExists = dl::getDelegate(session, getList(userlist,i),
+                                         getList(delegatelist, j), table);
+        if (delegateExists == 1)
+        {
+          printf("\nDelegate: [%1]\n", getList(delegatelist, j));
+          
+          dl::getSubscribers(lib, session, getList(userlist,i), getList(delegatelist, j), filter, &subscriberlist);
+          if (countList(subscriberlist) > 0)
+          {
+            for (k = 0; k < countList(subscriberlist); k++)
+            {
+              
+              subscriptionExists = dl::getSubscription(session, getList(userlist,i),
+                                                       getList(delegatelist, j),
+                                                       getList(subscriberlist, k),
+                                                       table);
+              if (subscriptionExists == 1)
+              {
+                printf("\n\tSubscriber: [%1]\n", getList(subscriberlist, k));
+                printf("\n\texpiration = %1\n", table::get(table, "expiration"));
+                printf("\n\tpermit_offline = %1\n", table::get(table, "permit_offline"));
+                printf("\n\toffline_duration = %1\n", table::get(table, "offline_duration"));
+                printf("\n\taccess_max = %1\n", table::get(table, "access_max"));
+                printf("\n\taccess_count = %1\n", table::get(table, "access_count"));
+              }
+              else
+              {
+                printf("\nSubscription '%1' does not exist!\n", getList(subscriberlist, k));
+              }
+            }
+          }
+          else
+          {
+            printf("\n\t- No Subscribers exist\n");
+          }
+        }
+        else
+        {
+          printf("\nDelegate '%1' does not exist!\n", getList(delegatelist, j));
+        }
+      }
+    }
+    else
+    {
+      //printf("\n- No Delegates exist\n");
+    }
+  }
+  printf("\n- - - - - - - - - - - - - - - - - - - - -\n");
+  
+  printf("\nUPDATING SUBSCRIBERS ...\n");
+  
+  table::clear(table);
+  table::set(table, "expiration", 0);
+  table::set(table, "permit_offline", 1);
+  table::set(table, "offline_duration", 12);
+  table::set(table, "access_max", 0);
+  table::set(table, "flags", 0);
+
+  b = dl::updateSubscription(session, user_main, delegate1, user1, table);
+  if (b == 1)
+  {
+    printf("Updated Subscriber [%1]\n", user1);
+    printf("- (Notice 'Offline_Duration' was updated)\n");
+  }
+  else
+  {
+    printf("- Error updating subscriber\n");
+  }
+  
+  printf("\n- - - GET SUBSCRIBERS (AFTER UPDATE) - - -\n");
+  
+  ds::getUsers(lib, session, filter, &userlist);
+  
+  for (i = 0; i < countList(userlist); i++)
+  {
+    dl::getDelegates(session, getList(userlist,i), &delegatelist);
+    if (countList(delegatelist) > 0)
+    {
+      for (j = 0; j < countList(delegatelist); j++)
+      {
+        delegateExists = dl::getDelegate(session, getList(userlist,i),
+                                         getList(delegatelist, j), table);
+        if (delegateExists == 1)
+        {
+          printf("\nDelegate: [%1]\n", getList(delegatelist, j));
+          
+          dl::getSubscribers(session, getList(userlist,i), getList(delegatelist, j), filter, &subscriberlist);
+
+          if (countList(subscriberlist) > 0)
+          {
+            for (k = 0; k < countList(subscriberlist); k++)
+            {
+              
+              subscriptionExists = dl::getSubscription(session, getList(userlist,i),
+                                                       getList(delegatelist, j),
+                                                       getList(subscriberlist, k),
+                                                       table);
+              if (subscriptionExists == 1)
+              {
+                printf("\n\tSubscriber: [%1]\n", getList(subscriberlist, k));
+                printf("\n\texpiration = %1\n", table::get(table, "expiration"));
+                printf("\n\tpermit_offline = %1\n", table::get(table, "permit_offline"));
+                printf("\n\toffline_duration = %1\n", table::get(table, "offline_duration"));
+                printf("\n\taccess_max = %1\n", table::get(table, "access_max"));
+                printf("\n\taccess_count = %1\n", table::get(table, "access_count"));
+              }
+              else
+              {
+                printf("\nSubscription '%1' does not exist!\n", getList(subscriberlist, k));
+              }
+            }
+          }
+          else
+          {
+            printf("\n\t- No Subscribers exist\n");
+          }
+        }
+        else
+        {
+          printf("\nDelegate '%1' does not exist!\n", getList(delegatelist, j));
+        }
+      }
+    }
+    else
+    {
+      //printf("\n- No Delegates exist\n");
+    }
+  }
+  printf("\n- - - - - - - - - - - - - - - - - - - - -\n");
+  
+  clearList(subscriptionlist);
+  
+  printf("\n- - - GET SUBSCRIPTIONS (AFTER CHANGES) - - -\n");
+  
+  for (i = 0; i < countList(userlist); i++)
+  {
+    subscriptionList_Exist = dl::getSubscriptions(session, getList(userlist,i), &subscriptionlist);
+
+    printf("\nUser: [%1]\n", getList(userlist,i));
+
+    if (countList(subscriptionlist) > 0)
+    {
+      print(subscriptionlist);
+    }
+    else
+    {
+      printf("- User is not subscribed to any Delegates\n");
+    }
+  }
+  
+  printf("\n- - - - - - - - - - - - - - - - - - - - -\n");
+  
+  printf("\nUNSUBSCRIBING USERS\n");
+  
+  c = dl::unsubscribe(session, user_main, delegate2, user2);
+  if (c == 1)
+  {
+    printf("- Unsubscribed [%1] from [%2]\n", user2, delegate2);
+  }
+  else
+  {
+    printf("- Error: unsubscribing [%1] from [%2]\n", user2, delegate2);
+  }
+  
+  clearList(subscriberlist);
+  
+  printf("\n- - - GET SUBSCRIBERS (AFTER UNSUBSCRIBING) - - -\n");
+  
+  ds::getUsers(lib, session, filter, &userlist);
+  for (i = 0; i < countList(userlist); i++)
+  {
+    dl::getDelegates(session, getList(userlist,i), &delegatelist);
+    
+    if (countList(delegatelist) > 0)
+    {
+      for (j = 0; j < countList(delegatelist); j++)
+      {
+        delegateExists = dl::getDelegate(session, getList(userlist,i),
+                                         getList(delegatelist, j), table);
+        if (delegateExists == 1)
+        {
+          printf("\nDelegate: [%1]\n", getList(delegatelist, j));
+          
+          dl::getSubscribers(session, getList(userlist,i), getList(delegatelist, j), filter, &subscriberlist);
+          if (countList(subscriberlist) > 0)
+          {
+            for (k = 0; k < countList(subscriberlist); k++)
+            {
+              
+              subscriptionExists = dl::getSubscription(session, getList(userlist,i),
+                                                       getList(delegatelist, j),
+                                                       getList(subscriberlist, k),
+                                                       table);
+              if (subscriptionExists == 1)
+              {
+                printf("\n\tSubscriber: [%1]\n", getList(subscriberlist, k));
+                printf("\n\texpiration = %1\n", table::get(table, "expiration"));
+                printf("\n\tpermit_offline = %1\n", table::get(table, "permit_offline"));
+                printf("\n\toffline_duration = %1\n", table::get(table, "offline_duration"));
+                printf("\n\taccess_max = %1\n", table::get(table, "access_max"));
+                printf("\n\taccess_count = %1\n", table::get(table, "access_count"));
+              }
+              else
+              {
+                printf("\nSubscription '%1' does not exist!\n", getList(subscriberlist, k));
+              }
+            }
+          }
+          else
+          {
+            printf("\n\t- No Subscribers exist\n");
+          }
+        }
+        else
+        {
+          printf("\nDelegate '%1' does not exist!\n", getList(delegatelist, j));
+        }
+      }
+    }
+    else
+    {
+      //printf("\n- No Delegates exist\n");
+    }
+  }
+  printf("\n- - - - - - - - - - - - - - - - - - - - -\n");
+  
+  clearList(subscriptionlist);
+  
+  printf("\n- - - GET SUBSCRIPTIONS (AFTER UNSUBSCRIBING) - - -\n");
+  
+  for (i = 0; i < countList(userlist); i++)
+  {
+    subscriptionList_Exist = dl::getSubscriptions(session, getList(userlist,i), &subscriptionlist);
+    
+    printf("\nUser: [%1]\n", getList(userlist,i));
+    if (countList(subscriptionlist) > 0)
+    {
+      print(subscriptionlist);
+    }
+    else
+    {
+      printf("- User is not subscribed to any Delegates\n");
+    }
+  }
+  
+  printf("\n- - - - - - - - - - - - - - - - - - - - -\n");
+  
+  printf("\n- - - UNSUBSCRIBE ALL - - -\n");
+  d = dl::unsubscribeAll(session, user1);
+  if (d == 1)
+  {
+    printf("- Unsubscribed [%1] from All Delegates\n", user1);
+  }
+  else
+  {
+    printf("- Error: unsubscribing [%1] from ALL Delegates\n", user1);
+  }
+  
+  d = dl::unsubscribeAll(session, user2);
+  if (d == 1)
+  {
+    printf("- Unsubscribed [%1] from All Delegates\n", user2);
+  }
+  else
+  {
+    printf("- Error: unsubscribing [%1] from ALL Delegates\n", user2);
+  }
+  
+  printf("\n- - - - - - - - - - - - - - - - - - - - -\n");
+  
+  printf("\n- - - GET SUBSCRIBERS (AFTER UNSUBSCRIBING ALL) - - -\n");
+  
+  ds::getUsers( session, filter, &userlist);
+
+  for (i = 0; i < countList(userlist); i++)
+  {
+    dl::getDelegates(session, getList(userlist,i), &delegatelist);
+
+    if (countList(delegatelist) > 0)
+    {
+      for (j = 0; j < countList(delegatelist); j++)
+      {
+        delegateExists = dl::getDelegate(session, getList(userlist,i),
+                                         getList(delegatelist, j),
+                                         table);
+        if (delegateExists == 1)
+        {
+          printf("\nDelegate: [%1]\n", getList(delegatelist, j));
+          
+          dl::getSubscribers(session, getList(userlist,i), getList(delegatelist, j), filter, &subscriberlist);
+
+          if (countList(subscriberlist) > 0)
+          {
+            for (k = 0; k < countList(subscriberlist); k++)
+            {
+              
+              subscriptionExists = dl::getSubscription(session, getList(userlist,i),
+                                                       getList(delegatelist, j),
+                                                       getList(subscriberlist, k),
+                                                       table);
+              if (subscriptionExists == 1)
+              {
+                printf("\n\tSubscriber: [%1]\n", getList(subscriberlist, k));
+                printf("\n\texpiration = %1\n", table::get(table, "expiration"));
+                printf("\n\tpermit_offline = %1\n", table::get(table, "permit_offline"));
+                printf("\n\toffline_duration = %1\n", table::get(table, "offline_duration"));
+                printf("\n\taccess_max = %1\n", table::get(table, "access_max"));
+                printf("\n\taccess_count = %1\n", table::get(table, "access_count"));
+              }
+              else
+              {
+                printf("\nSubscription '%1' does not exist!\n", getList(subscriberlist, k));
+              }
+            }
+          }
+          else
+          {
+            printf("\n\t- No Subscribers exist\n");
+          }
+        }
+        else
+        {
+          printf("\nDelegate '%1' does not exist!\n", getList(delegatelist, j));
+        }
+      }
+    }
+    else
+    {
+      //printf("\n- No Delegates exist\n");
+    }
+  }
+  printf("\n- - - - - - - - - - - - - - - - - - - - -\n");
+  
+  printf("\n- - - GET SUBSCRIPTIONS (AFTER UNSUBSCRIBING ALL) - - -\n");
+  
+  for (i = 0; i < countList(userlist); i++)
+  {
+    subscriptionList_Exist = dl::getSubscriptions(session, getList(userlist,i), &subscriptionlist);
+
+    printf("\nUser: [%1]\n", getList(userlist,i));
+
+    if (countList(subscriptionlist) > 0)
+    {
+      print(subscriptionlist);
+    }
+    else
+    {
+      printf("- User is not subscribed to any Delegates\n");
+    }
+  }
+  
+  printf("\n- - - - - - - - - - - - - - - - - - - - -\n");
+  printf("\n- - - - - - - - - - - - - - - - - - - - -\n");
+  
+  printf("\nSUBSCRIBING USERS\n");
+  
+  /* Subscribing SampleUser1@myemail.com to Delegate_1 */
+  
+  table::clear(table);
+  table::set(table, "expiration", 0);
+  table::set(table, "permit_offline", 1);
+  table::set(table, "offline_duration", 1242);
+  table::set(table, "access_max", 0);
+  table::set(table, "flags", 0);
+
+  a = dl::subscribe(session,
+                    user_main,
+                    delegate1,
+                    user1,
+                    table);
+  if (a == 1)
+  {
+    printf("- Subscribed [%1] to [%2]\n", user1, delegate1);
+  }
+  else
+  {
+    printf("- Error: Could not subscribe [%1] to [%2]\n", user1, delegate1);
+    return;
+  }
+  
+  /* Subscribing SampleUser2@myemail.com to Delegate_1 */
+  
+  table::clear(table);
+  table::set(table, "expiration", 0);
+  table::set(table, "permit_offline", 1);
+  table::set(table, "offline_duration", 24);
+  table::set(table, "access_max", 0);
+  table::set(table, "flags", 0);
+
+  a = dl::subscribe(session,
+                    user_main,
+                    delegate2,
+                    user2,
+                    table);
+  if (a == 1)
+  {
+    printf("- Subscribed [%1] to [%2]\n", user2, delegate1);
+  }
+  else
+  {
+    printf("- Error: Could not subscribe [%1] to [%2]\n", user2, delegate1);
+    return;
+  }
+  
+  printf("\n- - - GET SUBSCRIBERS (AFTER SUBSCRIBING) - - -\n");
+  
+  ds::getUsers(session, filter, &userlist);
+
+  for (i = 0; i < countList(userlist); i++)
+  {
+    dl::getDelegates(session, getList(userlist,i), &delegatelist);
+    if (countList(delegatelist) > 0)
+    {
+      for (j = 0; j < countList(delegatelist); j++)
+      {
+        delegateExists = dl::getDelegate(session, getList(userlist,i),
+                                         getList(delegatelist, j),
+                                         table);
+        if (delegateExists == 1)
+        {
+          printf("\nDelegate: [%1]\n", getList(delegatelist, j));
+          
+          dl::getSubscribers(session, getList(userlist,i), getList(delegatelist, j), filter, &subscriberlist);
+
+          if (countList(subscriberlist) > 0)
+          {
+            for (k = 0; k < countList(subscriberlist); k++)
+            {
+              
+              subscriptionExists = dl::getSubscription(session, getList(userlist,i),
+                                                       getList(delegatelist, j),
+                                                       getList(subscriberlist, k),
+                                                       table);
+              if (subscriptionExists == 1)
+              {
+                printf("\n\tSubscriber: [%1]\n", getList(subscriberlist, k));
+                printf("\n\texpiration = %1\n", table::get(table, "expiration"));
+                printf("\n\tpermit_offline = %1\n", table::get(table, "permit_offline"));
+                printf("\n\toffline_duration = %1\n", table::get(table, "offline_duration"));
+                printf("\n\taccess_max = %1\n", table::get(table, "access_max"));
+                printf("\n\taccess_count = %1\n", table::get(table, "access_count"));
+              }
+              else
+              {
+                printf("\nSubscription '%1' does not exist!\n", getList(subscriberlist, k));
+              }
+            }
+          }
+          else
+          {
+            printf("\n\t- No Subscribers exist\n");
+          }
+        }
+        else
+        {
+          printf("\nDelegate '%1' does not exist!\n", getList(delegatelist, j));
+        }
+      }
+    }
+    else
+    {
+      //printf("\n- No Delegates exist\n");
+    }
+  }
+  printf("\n- - - - - - - - - - - - - - - - - - - - -\n");
+  
+  printf("\n- - - GET SUBSCRIPTIONS (AFTER UNSUBSCRIBING) - - -\n");
+                                         
+  for (i = 0; i < countList(userlist); i++)
+  {
+    subscriptionList_Exist = dl::getSubscriptions(session, getList(userlist,i) &subscriptionlist);
+
+    printf("\nUser: [%1]\n", getList(userlist,i));
+    
+    if (countList(subscriptionlist) > 0)
+    {
+      print(subscriptionlist);
+    }
+    else
+    {
+      printf("- User is not subscribed to any Delegates\n");
+    }
+  }
+  
+  table::delete(table);
+  
+  printf("\nSample finished running\n");
+  
+  return 0;
+}
+
+
+replace procedure authenticate_dsdb_auto(session, user)
+{
+  int i, j, status;
+  int cntLine, cntChallenges, cntAuthChallenge, locateSeparator, locateCred;
+  list list2, challenges, auth_challenge, userinfo, challenges_info;
+  string buf, name, outbuf, username, credentials, challenges_name, challenges_pro, challenges_res, challenges_buf;
+  string credFile = "$(SAMPLE)/SampleData/credentials.txt";
+  bytearray specFile;
+  
+  specFile = file::readAll(credFile);
+  
+  /* Get User Info from credentials.txt */
+  
+  userinfo = split(specFile, "\n\n");
+  cntLine = countList(userinfo);
+  
+  /* Extract User info from credentials file and place in list */
+  
+  for (i = 0; i < cntLine; i++)
+  {
+    locateSeparator = locate(getList(userinfo,i), "=");
+    username = substr(getList(userinfo,i), 0, locateSeparator);
+    if (username == user)
+    {
+      locateCred = (locateSeparator + 1);
+      credentials = substr(getList(userinfo,i), locateCred, 500);
+      challenges = split(credentials, "||");
+      cntChallenges = countList(challenges);
+    }
+  }
+  
+  /* Start authentication */
+  
+  for (;;)
+  {
+    status = ds::authenticate(session);
+    
+    switch (status)
+    {
+      case 16:
+        printf("You are authorized\n");
+        return 1;
+        
+      case 1:
+        printf("You are not authorized\n");
+        ds::closeSession(session);
+        ds::closeDatabase();
+        return 0;
+        
+      case 512:
+        buf = ds::getChallenges(session);
+        auth_challenge = split(buf, "|");
+        cntAuthChallenge = countList(auth_challenge);
+        
+        for (i = 0; i < cntAuthChallenge; i++)
+        {
+          name = getList(auth_challenge, i);
+          
+          for (j = 0; j < cntChallenges; j++)
+          {
+            challenges_buf = getList(challenges,j);
+            challenges_info = split(challenges_buf, "|");
+            challenges_name = getList(challenges_info,0);
+            challenges_pro = getList(challenges_info, 1);
+            challenges_res = getList(challenges_info, 2);
+            
+            if (challenges_pro == name)
+            {
+              if(strlen(outbuf) > 0)
+              {
+                outbuf = concat(outbuf, "||");
+              }
+              
+              outbuf = concat(outbuf, challenges_pro, "|", challenges_res);
+            }
+            
+            clearList(challenges_info);
+          }
+        }
+        
+        ds::setResponses(session, outbuf);
+        break;
+        
+      default:
+        return 0;
+    }
+  }
+}
+
+subscribers();

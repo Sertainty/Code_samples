@@ -1,0 +1,63 @@
+/*!
+    \copyright Sertainty Corporation, 2021. All Rights Reserved.
+
+    \file     1-delegate_create_uxpSql.uxl
+
+    \brief    This sample code creates a new uxpSql Database.
+
+    \author   Melvin Valdez de la Roca
+    \date     03/08/2021
+
+    \note     Application expects to find the necessary source files in the current working folder.
+*/
+
+/* 
+    DATA SERVICES UXL CALLS USED: 
+    - ds::dropDatabase
+    - ds::initDatabase
+*/
+ 
+replace procedure create_uxpSql()
+{
+    bytearray id;
+    string idFileSpec = "$(SAMPLE)/temp/sampleid.iic";
+    string user = "SampleUser@myemail.com";
+    string option = "UXP";
+
+    printf("\n\nCreating a Data Services DB\n\n");
+
+    /* Drop Database */
+
+    ds::dropDatabase(option, "");
+    if (errorstring)
+    {
+        printf("Error dropping UXP database: %1\n", errorstring);
+        return;
+    }
+    
+    /* Read an ID into buffer */
+
+    id = file::readAll(idFileSpec);
+    if (errorstring)
+    {
+        printf("Error reading sampleid.iic: %1\n", errorstring);
+        return;
+    }
+
+    /* Create new Delegate Service database from ID */
+
+    printf("Opening new data service database\n\n");
+
+    ds::initDatabase(id, user, option, "");
+    if (errorstring)
+    {
+        printf("\nError initializing [%1] data services database\n", option);
+        return;
+    }
+
+    printf("Sample finished running\n");
+
+    return 0;
+}
+
+create_uxpSql();

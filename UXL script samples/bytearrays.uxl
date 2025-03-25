@@ -1,0 +1,69 @@
+/*!
+    \copyright Sertainty Corporation, 2020.  All Rights Reserved.
+
+    \file      bytearrays.uxl
+
+    \brief     This sample demonstrates the use of a uxlByteArray, which is a UXP Data structure that is used to handle binary and ASCII data.
+               The sample demonstrates how to write data to and reading data from the uxlByteArray as well as load contents of a file read from the Virtual File system into the uxlByteArray.
+
+    \author    Melvin Valdez de la Roca
+    \date      06/23/2020
+
+    \note
+ */
+
+/**
+ * @brief Demonstrates bytearray usage.
+ * @return True if successful
+ */
+replace procedure bytearrays()
+{
+  bytearray buffer;
+  string fileSpec = "$(SAMPLE)/temp/temp.txt";
+
+  printf("\nUXL Byte Arrays\n");
+
+  string StrForFile = "ASCII Content for file. This can be binary as well.";
+  int lStrForFile = strlen(StrForFile);
+
+  buffer = StrForFile;
+  printf(concat("\n", "String Size : ", lStrForFile, "\n"));
+
+  /* A bytearray can only handle text or binary data */
+
+  printf(concat("Buffer Size: ", strlen(buffer), "\n"));
+
+  printf(concat("String Contents: ", StrForFile, "\n"));
+  printf(concat("Buffer Contents: ", buffer, "\n"));
+
+  file::writeAll(fileSpec, StrForFile, "Replace");
+  if (errorstring)
+  {
+    printf("Error writing buffer to file: %1\n", errorstring);
+    return;
+  }
+  else
+  {
+    printf("\nFile written to disk successfully.\n");
+    buffer = file::readAll(fileSpec);
+    if (errorstring)
+    {
+      printf("Error reading file into buffer: %1\n", errorstring);
+      return;
+    }
+    else
+    {
+      printf("Content Size: %1\n", lStrForFile);
+      printf("Buffer Size : %1\n", strlen(buffer));
+
+      printf("Contents       : %1\n", StrForFile);
+      printf("Buffer Contents: %1\n", buffer);
+    }
+  }
+
+  printf("\nSample finished running\n");
+
+  return 0;
+}
+
+bytearrays();

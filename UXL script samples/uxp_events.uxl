@@ -1,0 +1,287 @@
+/*! \copyright Sertainty Corporation, 2020.  All Rights Reserved.
+
+   \file     uxp_events.uxl
+
+   \brief    Demonstrates the features of a UXP recording events at a Sertainty Services.
+
+   \details  Creates a sample ID that will record events to a Sertainty Services server.
+   
+             Creates the Sertainty Services database and registers the sample ID in order to accept events.
+             
+             Selects event records from the Sertainty Services database.
+
+   \author   Greg Smith
+   \date     10/13/2020
+*/
+
+replace procedure authenticate_dsdb_session(lib, session)
+{
+  int done = false;
+  int x, i, cnt, status;
+  list list2, challenges;
+  string buf, name, prompt, response, outbuf;
+
+  while (!done)
+  {
+    status = ds::authenticate(lib, session);
+    
+    switch (status)
+    {
+      case 16:
+        printf("You are authorized\n");
+        return true;
+
+      case 1:
+        printf("You are not authorized\n");
+        ds::closeSession(lib, session);
+        ds::closeDatabase(lib);
+        return false;
+
+      case 512:
+        buf = ds::getChallenges(lib, session);
+        challenges = split(buf, "||");
+        cnt = countList(challenges);
+
+        for (i = 0; i<cnt; i++)
+        {
+          x = i+1;
+          list2 = split(getList(challenges, i), '|');
+          name = getList(list2,0);
+          prompt = getList(list2,1);
+
+          if (strlen(outbuf) > 0)
+          {
+            outbuf = concat(outbuf, "||");
+          }
+
+          if (name == "USERNAME")
+          {
+            response = "Admin";
+          }
+          else
+          {
+            response = concat("Response ", substr(prompt,10, -1));
+          }
+
+          outbuf = concat(outbuf,name,"|",prompt,"|",response);
+        }
+
+        ds::setResponses(lib, session, outbuf);
+        break;
+    }
+  }
+}
+
+replace procedure uxp_events_sample()
+{
+  list inlist, outlist, filters;
+  ValuePair pair;
+  int i, j;
+  on return
+  {
+    if (db)
+      ds::closeDatabase(db);
+  }
+
+  bytearray b1, idbuf, id, id2;
+  int status, done, db, session, sf, isAuthorized;
+  string key = "01234567890123456789012345678901";
+
+  struct delegate_s
+  {
+    string    description;
+    date      expiration;
+    int       permit_offline;
+    int       offline_duration;
+    int       access_max;
+    string    checksum;
+    bytearray uxpid;
+  } delegate;
+
+  struct subscription_s
+  {
+    date      expiration;
+    int       permit_offline;
+    int       offline_duration;
+    int       access_max;
+    int       access_count;
+  } subscription;
+
+  struct user_s
+  {
+    string    formalname;
+    string    description;
+    string    email;
+    int       privileges;
+    string    app_data1;
+    string    app_data2;
+  } user;
+  
+  struct userid_s
+  {
+    int       flags;
+    string    description;
+    bytearray uxpid;
+    bytearray source;
+  } userid;
+
+  printf("\nSample UXL script for UXP Remote Event Logging\n\n");
+
+  string user1 = "SampleUser@myemail.com";
+  
+  /************************************************************/
+  /* Create a new ID from the sampleid.xml ID definition.  We */
+  /* are using the sample ID to create the service database.  */
+  /************************************************************/
+
+  printf("Creating sample ID\n");
+  
+  idbuf = file::readAll("$(SAMPLE)/SampleData/sampleid.xml");
+
+  idbuf = id::setRuleParameter(idbuf, "", "Events",
+                               "LogAccesses", true);
+
+  idbuf = id::setRuleParameter(idbuf, "", "Events",
+                               "RemoteURL",
+                               "file://$(SAMPLE)/temp/services.db");
+
+  idbuf = id::setRuleParameter(idbuf, "", "Events",
+                               "RecordRemote", true);
+
+  id = id::newIdFromDocument(idbuf);
+  
+  file::writeAll("$(SAMPLE)/temp/sampleid.iic", id, "replace");
+
+  /************************************************************/
+  /* Load UXP delegate code and create a db with SYSADMIN     */
+  /************************************************************/
+
+  printf("Creating Sertainty Services database\n");
+
+  ds::initDatabase("$(SAMPLE)/temp/services.db",id, user1);
+  if (errorstring)
+  {
+    printf("\nError initializing UXP data services database\n");
+    return;
+  }
+  
+  db = ds::openDatabase("$(SAMPLE)/temp/services.db");
+
+  /************************************************************/
+  /* Open new database.  Authentication will happen at        */
+  /* command line                                             */
+  /************************************************************/
+
+  printf("Opening session and authenticating\n");
+
+  printf("\nCredentials necessary to open session:\n");
+  printf("  Username = %1\n", user1);
+  printf("  Challenge 1 = Response 1\n");
+  printf("  Challenge 2 = Response 2\n");
+  printf("  ... \n");
+  printf("  Challenge 10 = Response 10\n\n");
+
+  session = ds::openSession(db, user1);
+
+  isAuthorized = authenticate_dsdb_session(db, session);
+  if (!isAuthorized)
+    return;
+
+  ds::setServer(db, session, "file:///services.db");
+  ds::setAccessCode(db, session, key);
+  
+  /************************************************************/
+  /* Store the source of the ID                               */
+  /************************************************************/
+
+  idbuf = file::readAll("$(SAMPLE)/SampleData/sampleid.xml");
+
+  ds::getUserId(db, session,
+                user1,
+                "AdminID",
+                &userid.flags,
+                &userid.description,
+                &userid.uxpid,
+                &userid.source);
+                
+  userid.description = "My session ID";
+  
+  ds::updateUserId(db, session,
+                   user1,
+                   "AdminID",
+                    &userid.flags,
+                    &userid.description,
+                    &userid.uxpid,
+                    &idbuf);
+
+  /************************************************************/
+  /* Print out user info                                      */
+  /************************************************************/
+
+  ds::getUser(db,session, user1,
+              &user.formalname,
+              &user.description,
+              &user.email,
+              &user.privileges,
+              &user.app_data1,
+              &user.app_data2);
+
+  printf("\nUser: %1\n", user1);
+  printf("-----------------------------\n");
+
+  printf("Formal Name: %1\n", user.formalname);
+  printf("Description: %1\n", user.description);
+  printf("Email: %1\n", user.email);
+  printf("Privileges: %1\n", user.privileges);
+
+  ds::getUserId(db, session,
+                user1,
+                "AdminID",
+                &userid.flags,
+                &userid.description,
+                &userid.uxpid,
+                &userid.source);
+
+  printf("\nUser: %1  ID: SessionID\n", user1);
+  printf("--------------------------------------------\n");
+
+  printf("Description: %1\n", userid.description);
+  printf("Flags: %1\n", userid.flags);
+  printf("Uxpid: *****\n");
+  printf("Source: *****\n");
+
+  /************************************************************/
+  /* Create a UXP                                             */
+  /************************************************************/
+
+  printf("\nCreating UXP\n");
+
+  sf = sf::newUxp("$(SAMPLE)/temp/test.uxp",
+                  "$(SAMPLE)/temp/sampleid.iic",
+                  "IDFile|Replace");
+  if (errorstring)
+  {
+    printf("Error Creating new UXP: %1\n", errorstring);
+    return;
+  }
+
+  /************************************************************/
+  /* Print out event records                                  */
+  /************************************************************/
+
+  registry::getEvents(db, session, &outlist, filters);
+  
+  printf("\nEvent Records\n");
+  printf("-------------\n");
+
+  for (i = 0; i < countList(outlist); i++)
+  {
+    registry::getEvent(db, session, getList(outlist,i), &b1);
+  
+    printf("%1\n", b1);
+  }
+
+  printf("Sample finished running\n");
+}
+
+uxp_events_sample();

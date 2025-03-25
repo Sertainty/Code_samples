@@ -1,0 +1,137 @@
+/*!
+    \copyright Sertainty Corporation, 2021. All Rights Reserved.
+
+    \file     open_uxp_auth-v2id.uxl
+
+    \brief    This sample shows how to open and interactively authenticate a UXP Object using known prompt/response pairs and read contents of virtual files protected within a UXP Object.
+
+    \author   Melvin Valdez de la Roca
+    
+    \edited   Melani Smith Weed
+    \date     03/12/2021
+
+    \note     Application expects to find the necessary source files in the current working folder.
+ */
+
+replace procedure authenticate_uxp(appHandle)
+{
+  int i, cnt, status;
+  list challenges;
+  string buf, prompt, response, outbuf;
+
+  for (;;)
+  {
+    status = sf::authenticate(appHandle);
+    if (status != 512)
+      break;
+      
+    buf = sf::getChallenges(appHandle);
+    challenges = split(buf, "|");
+    cnt = countList(challenges);
+
+    for (i = 0; i < cnt; i++)
+    {
+      prompt = getList(challenges,i);
+
+      if (strlen(outbuf) > 0)
+      {
+        outbuf = concat(outbuf, "||");
+      }
+
+      if (toUpper(prompt) == "USERNAME")
+      {
+        response = "SampleUser@myemail.com";
+      }
+      else
+      {
+        response = concat("Response ", substr(prompt,10, -1));
+      }
+
+      outbuf = concat(outbuf,prompt,"|",response);
+    }
+
+    sf::setResponses(data, outbuf);
+  }
+   
+  return status;
+}
+
+replace procedure open_uxp_auth()
+{
+  bytearray buffer;
+  int appHandle, fileHandle, len, status;
+  string uxpFileSpec = "$(SAMPLE)/temp/sample-v2.uxp";
+  string copy2Spec = "$(SAMPLE)/temp/copy2.pdf";
+  string fp;
+
+  printf("\nOpening and Authenticating into a UXP interactively\n\n");
+
+  printf("Opening new Data\n");
+
+  printf("\nCredentials necessary to access UXP:\n");
+  printf("  Username = SampleUser@myemail.com\n");
+  printf("  Challenge 1 = Response 1\n");
+  printf("  Challenge 2 = Response 2\n");
+  printf("  ... \n");
+  printf("  Challenge 10 = Response 10\n\n");
+
+  appHandle = sf::openUxp(uxpFileSpec, "ShareReadOnly");
+  if (errorstring)
+  {
+    printf("\nError opening UXP: %1\n", errorstring);
+    return;
+  }
+
+  status = authenticate_uxp(appHandle);
+  if (status != 16)
+  {
+    printf("You are not authorized\n");
+    return;
+  }
+  else
+  {
+    printf("You are authorized\n");
+  }
+
+  printf("\nExtracting data.pdf to copy2.pdf\n");
+
+  fileHandle = sf::openFile(appHandle, "data.pdf");
+  if (errorstring)
+  {
+    printf("Error opening virtual file: %1\n", errorstring);
+  }
+
+  fp = file::open(copy2Spec, "wb");
+
+  while (sf::readFile(appHandle, fileHandle, buffer, 100000))
+  {
+    len = strlen(buffer);
+    file::write(buffer, len, 1, fp);
+  }
+
+  file::close(fp);
+
+  sf::closeFile(appHandle, fileHandle);
+
+  if (sf::compareExternalFile(appHandle, "data.pdf", copy2Spec))
+  {
+    printf("Comparison of data.pdf to copy2.pdf: successful\n");
+  }
+  else
+  {
+    printf("Comparison of data.pdf to copy2.pdf: failed\n");
+  }
+
+  /* Close the UXP Object */
+
+  sf::closeUxp(appHandle);
+
+  printf("You have successfully opened and interactively authenticated into a UXP.\n");
+  printf("You may try out other advanced samples now.\n");
+
+  printf("\nSample finished running\n");
+
+  return 0;
+}
+
+open_uxp_auth();

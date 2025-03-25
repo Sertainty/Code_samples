@@ -1,0 +1,659 @@
+/*!
+ \copyright Sertainty Corporation, 2021. All Rights Reserved.
+ 
+ \file     5-delegate_add_delegates.uxl
+ 
+ \brief    This sample code opens the newly created database and adds the Delegates.
+ 
+ \author   Melvin Valdez de la Roca
+ \date     03/08/2021
+ 
+ \note     Application expects to find the necessary source files in the current working folder.
+ */
+
+/*
+ dl::deleteDelegate
+ dl::getDelegate
+ dl::getDelegates
+ dl::getPublicDelegate
+ dl::getPublicDelegates
+ dl::newDelegate
+ dl::updateDelegate
+ */
+
+replace procedure delegates()
+{
+  table table;
+  string user = "SampleUser@myemail.com";
+  string user1 = "SampleUser1@myemail.com";
+  string user2 = "SampleUser2@myemail.com";
+  string userId1 = "ID1";
+  string delegate1 = "Delegate_1";
+  string delegate2 = "Delegate_2";
+  string delegate3 = "Delegate_3";
+  int session;
+  int a, b, c, i, j, delegateExists, publicdelegateExists;
+  list userlist, filter, delegatelist, publicdelegatelist;
+  bytearray id1;
+  
+  on return
+  {
+    ds::closeSession(lib, session);
+    ds::closeDatabase(lib);
+  }
+  
+  table = table::create();
+  
+  /* Open Database */
+  
+  lib = ds::openDatabase(0);
+  if (errorstring)
+  {
+    printf("Error opening data services database: %1\n", errorstring);
+    return;
+  }
+  else
+  {
+    printf("\nOpened Database");
+  }
+  
+  /* Open Session */
+  
+  session = ds::openSession(user);
+  if (errorstring)
+  {
+    printf("Error opening session for data services database: %1\n", errorstring);
+    return;
+  }
+  else
+  {
+    printf("\nOpened Session\n");
+  }
+  
+  authenticate_dsdb_auto(session, user);
+  
+  printf("\n- - - GET DELEGATES (BEFORE CHANGES) - - -\n");
+  ds::getUsers(session, filter, &userlist);
+
+  for (i = 0; i < countList(userlist); i++)
+  {
+    dl::getDelegates(session, getList(userlist,i), &delegatelist);
+    
+    if (countList(delegatelist) > 0)
+    {
+      for (j = 0; j < countList(delegatelist); j++)
+      {
+        delegateExists = dl::getDelegate(session, getList(userlist,i),
+                                         getList(delegatelist, j), table);
+        if (delegateExists == 1)
+        {
+          printf("\nOwner: [%1]\n", getList(userlist,i));
+          printf("\n\tDelegate: [%1]\n", getList(delegatelist, j));
+          printf("\n\tdescription = %1\n", table::get(table, "description"));
+          printf("\n\texpiration = %1\n", table::get(table, "expiration"));
+          printf("\n\tpermit_offline = %1\n", table::get(table, "permit_offline"));
+          printf("\n\toffline_duration = %1\n", table::get(table, "offline_duration"));
+          printf("\n\taccess_max = %1\n", table::get(table, "access_max"));
+          printf("\n\tflags = %1\n", table::get(table, "flags"));
+          printf("\n\tchecksum = %1\n\n", table::get(table, "checksum"));
+        }
+        else
+        {
+          printf("\nDelegate '%1' does not exist!\n", getList(delegatelist, j));
+        }
+      }
+    }
+    else
+    {
+      printf("\n- No Delegates exist\n");
+    }
+  }
+  printf("\n- - - - - - - - - - - - - - - - - - - - -\n");
+  
+  printf("\n- - - GET PUBLIC DELEGATES (BEFORE CHANGES) - - -\n");
+  for (i = 0; i < countList(userlist); i++)
+  {
+    dl::getPublicDelegates(lib, getList(userlist,i), &publicdelegatelist);
+    
+    if (countList(publicdelegatelist) > 0)
+    {
+      for (j = 0; j < countList(publicdelegatelist); j++)
+      {
+        publicdelegateExists = dl::getPublicDelegate(getList(userlist,i),
+                                                     getList(publicdelegatelist,j),
+                                                     table);
+        if (publicdelegateExists == 1)
+        {
+          printf("\nOwner: [%1]\n", getList(userlist,i));
+          printf("\n\tPublicDelegate: [%1]\n", getList(publicdelegatelist,j));
+          printf("\n\tdescription = %1\n", publictable::get(table, "description"));
+          printf("\n\tchecksum = %1\n", publictable::get(table, "checksum"));
+        }
+        else
+        {
+          printf("\nPublicDelegate '%1' does not exist!\n", getList(publicdelegatelist,j));
+        }
+      }
+    }
+    else
+    {
+      printf("\n- No Public Delegates exist\n");
+    }
+  }
+  printf("\n- - - - - - - - - - - - - - - - - - - - -\n");
+  
+  printf("\nADDING NEW DELEGATES\n");
+  
+  /* Add First Delegate */
+  
+  table::clear(table);
+  table::set(table, "description", "First delegate");
+  table::set(table, "expiration", 0);
+  table::set(table, "permit_offline", 1);
+  table::set(table, "offline_duration", 24);
+  table::set(table, "access_max", 0);
+  table::set(table, "flags", 1);
+
+  a = dl::newDelegate(session, user, delegate1, table);
+  if (a == 1)
+  {
+    printf("- Delegate [%1] added successfully\n", delegate1);
+  }
+  else
+  {
+    printf("- Error creating new Delegate [%1]\n", delegate1);
+    return;
+  }
+  
+  /* Add Second Delegate */
+  
+  table::clear(table);
+  table::set(table, "description", "Second delegate");
+  table::set(table, "expiration", 0);
+  table::set(table, "permit_offline", 1);
+  table::set(table, "offline_duration", 24);
+  table::set(table, "access_max", 0);
+  table::set(table, "flags", 1);
+
+  a = dl::newDelegate(session, user, delegate2, table);
+  if (a == 1)
+  {
+    printf("- Delegate [%1] added successfully\n", delegate2);
+  }
+  else
+  {
+    printf("- Error creating new Delegate\n");
+    return;
+  }
+  
+  /* Add Third Delegate */
+  
+  table::clear(table);
+  table::set(table, "description", "Third delegate");
+  table::set(table, "expiration", 0);
+  table::set(table, "permit_offline", 1);
+  table::set(table, "offline_duration", 24);
+  table::set(table, "access_max", 0);
+  table::set(table, "flags", 1);
+
+  a = dl::newDelegate(session, user, delegate3, table);
+  if (a == 1)
+  {
+    printf("- Delegate [%1] added successfully\n", delegate3);
+  }
+  else
+  {
+    printf("- Error creating new Delegate\n");
+    return;
+  }
+  
+  printf("\nATTEMPTING TO ADD SAME DELEGATE ...\n");
+
+  table::clear(table);
+  table::set(table, "description", "First delegate");
+  table::set(table, "expiration", 0);
+  table::set(table, "permit_offline", 1);
+  table::set(table, "offline_duration", 24);
+  table::set(table, "access_max", 0);
+  table::set(table, "flags", 1);
+
+  a = dl::newDelegate(session, user, delegate1, table);
+  if (a == 1)
+  {
+    printf("- Delegate [%1] added successfully\n", delegate1);
+  }
+  else
+  {
+    printf("- Error creating new Delegate\n");
+  }
+  
+  clearList(delegatelist);
+  
+  printf("\n- - - GET DELEGATES (AFTER CHANGES) - - -\n");
+  
+  ds::getUsers(lib, session, filter, &userlist);
+  for (i = 0; i < countList(userlist); i++)
+  {
+    dl::getDelegates(lib, session, getList(userlist,i), &delegatelist);
+    if (countList(delegatelist) > 0)
+    {
+      for (j = 0; j < countList(delegatelist); j++)
+      {
+        delegateExists = dl::getDelegate(session, getList(userlist,i),
+                                         getList(delegatelist, j), table);
+        if (delegateExists == 1)
+        {
+          printf("\nOwner: [%1]\n", getList(userlist,i));
+          printf("\n\tDelegate: [%1]\n", getList(delegatelist, j));
+          printf("\n\tdescription = %1\n", table::get(table, "description"));
+          printf("\n\texpiration = %1\n", table::get(table, "expiration"));
+          printf("\n\tpermit_offline = %1\n", table::get(table, "permit_offline"));
+          printf("\n\toffline_duration = %1\n", table::get(table, "offline_duration"));
+          printf("\n\taccess_max = %1\n", table::get(table, "access_max"));
+          printf("\n\tflags = %1\n", table::get(table, "flags"));
+          printf("\n\tchecksum = %1\n\n", table::get(table, "checksum"));
+        }
+        else
+        {
+          printf("\nDelegate '%1' does not exist!\n", getList(delegatelist, j));
+        }
+      }
+    }
+    else
+    {
+      printf("\n- No Delegates exist\n");
+    }
+  }
+  printf("- - - - - - - - - - - - - - - - - - - - -\n");
+  
+  clearList(publicdelegatelist);
+  
+  printf("\n- - - GET PUBLIC DELEGATES (AFTER CHANGES) - - -\n");
+  
+  for (i = 0; i < countList(userlist); i++)
+  {
+    dl::getPublicDelegates(getList(userlist,i), &publicdelegatelist);
+    
+    if (countList(publicdelegatelist) > 0)
+    {
+      for (j = 0; j < countList(publicdelegatelist); j++)
+      {
+        publicdelegateExists = dl::getPublicDelegate(getList(userlist,i),
+                                                     getList(publicdelegatelist,j),
+                                                     table);
+        if (publicdelegateExists == 1)
+        {
+          printf("\nOwner: [%1]\n", getList(userlist,i));
+          printf("\n\tPublicDelegate: [%1]\n", getList(publicdelegatelist,j));
+          printf("\n\tdescription = %1\n", publictable::get(table, "description"));
+          printf("\n\tchecksum = %1\n", publictable::get(table, "checksum"));
+        }
+        else
+        {
+          printf("\nPublicDelegate '%1' does not exist!\n", getList(publicdelegatelist,j));
+        }
+      }
+    }
+    else
+    {
+      printf("\n- No Public Delegates exist\n");
+    }
+  }
+  printf("\n- - - - - - - - - - - - - - - - - - - - -\n");
+  
+  printf("\nUPDATING NEW DELEGATE\n");
+  
+  table::clear(table);
+  table::set(table, "description", "UPDATED DESCRIPTION");
+  table::set(table, "expiration", 0);
+  table::set(table, "permit_offline", 1);
+  table::set(table, "offline_duration", 24);
+  table::set(table, "access_max", 0);
+  table::set(table, "flags", 1);
+
+  b = dl::updateDelegate(session, user, delegate1, table);
+  if (b == 1)
+  {
+    printf("- Updated Delegate\n");
+  }
+  else
+  {
+    printf("- Error UPDATING Delegate\n");
+  }
+  
+  printf("\n- - - GET DELEGATES (AFTER UPDATE) - - -\n");
+  
+  ds::getUsers(session, filter, &userlist);
+  
+  for (i = 0; i < countList(userlist); i++)
+  {
+    dl::getDelegates(session, getList(userlist,i), &delegatelist);
+
+    if (countList(delegatelist) > 0)
+    {
+      for (j = 0; j < countList(delegatelist); j++)
+      {
+        delegateExists = dl::getDelegate(session, getList(userlist,i),
+                                         getList(delegatelist, j),
+                                         table);
+        if (delegateExists == 1)
+        {
+          printf("\nOwner: [%1]\n", getList(userlist,i));
+          printf("\n\tDelegate: [%1]\n", getList(delegatelist, j));
+          printf("\n\tdescription = %1\n", table::get(table, "description"));
+          printf("\n\texpiration = %1\n", table::get(table, "expiration"));
+          printf("\n\tpermit_offline = %1\n", table::get(table, "permit_offline"));
+          printf("\n\toffline_duration = %1\n", table::get(table, "offline_duration"));
+          printf("\n\taccess_max = %1\n", table::get(table, "access_max"));
+          printf("\n\tflags = %1\n", table::get(table, "flags"));
+          printf("\n\tchecksum = %1\n\n", table::get(table, "checksum"));
+        }
+        else
+        {
+          printf("\nDelegate '%1' does not exist!\n", getList(delegatelist, j));
+        }
+      }
+    }
+    else
+    {
+      printf("\n- No Delegates exist\n");
+    }
+  }
+  printf("- - - - - - - - - - - - - - - - - - - - -\n");
+  
+  clearList(userlist);
+  clearList(delegatelist);
+  
+  printf("\nDELETING DELEGATE\n");
+  
+  c = dl::deleteDelegate(lib, session, user, delegate3);
+  if (c == 1)
+  {
+    printf("- Delegate [%1] Deleted\n", delegate3);
+    
+    printf("\n- - - GET DELEGATES (AFTER DELETION) - - -\n");
+    ds::getUsers(lib, session, filter, &userlist);
+    for (i = 0; i < countList(userlist); i++)
+    {
+      dl::getDelegates(session, getList(userlist,i), &delegatelist);
+      if (countList(delegatelist) > 0)
+      {
+        for (j = 0; j < countList(delegatelist); j++)
+        {
+          delegateExists = dl::getDelegate(session, getList(userlist,i),
+                                           getList(delegatelist, j),
+                                           table);
+          if (delegateExists == 1)
+          {
+            printf("\nOwner: [%1]\n", getList(userlist,i));
+            printf("\n\tDelegate: [%1]\n", getList(delegatelist, j));
+            printf("\n\tdescription = %1\n", table::get(table, "description"));
+            printf("\n\texpiration = %1\n", table::get(table, "expiration"));
+            printf("\n\tpermit_offline = %1\n", table::get(table, "permit_offline"));
+            printf("\n\toffline_duration = %1\n", table::get(table, "offline_duration"));
+            printf("\n\taccess_max = %1\n", table::get(table, "access_max"));
+            printf("\n\tflags = %1\n", table::get(table, "flags"));
+            printf("\n\tchecksum = %1\n\n", table::get(table, "checksum"));
+          }
+          else
+          {
+            printf("\nDelegate '%1' does not exist!\n", getList(delegatelist, j));
+          }
+        }
+      }
+      else
+      {
+        printf("\n- No Delegates exist\n");
+      }
+    }
+  }
+  else
+  {
+    printf("- Error: Delegate could not be deleted");
+  }
+  printf("- - - - - - - - - - - - - - - - - - - - -\n");
+  
+  clearList(userlist);
+  clearList(delegatelist);
+  
+  printf("\nDELETING ALL DELEGATES\n");
+  
+  c = dl::deleteDelegate(session, user, delegate1);
+  if (c == 1)
+  {
+    printf("\n- Deleted [%1]\n", delegate1);
+  }
+  else
+  {
+    printf("- Error: [%1] could not be deleted", delegate1);
+  }
+  
+  c = dl::deleteDelegate(session, user, delegate2);
+  if (c == 1)
+  {
+    printf("\n- Deleted [%1]\n", delegate2);
+  }
+  else
+  {
+    printf("- Error: [%1] could not be deleted", delegate2);
+  }
+  
+  printf("\n- - - GET DELEGATES (AFTER DELETE ALL) - - -\n");
+  
+  ds::getUsers(session, filter, &userlist);
+  
+  for (i = 0; i < countList(userlist); i++)
+  {
+    dl::getDelegates(session, getList(userlist,i), &delegatelist);
+
+    if (countList(delegatelist) > 0)
+    {
+      for (j = 0; j < countList(delegatelist); j++)
+      {
+        delegateExists = dl::getDelegate(session, getList(userlist,i),
+                                         getList(delegatelist, j), table);
+        if (delegateExists == 1)
+        {
+          printf("\nOwner: [%1]\n", getList(userlist,i));
+          printf("\n\tDelegate: [%1]\n", getList(delegatelist, j));
+          printf("\n\tdescription = %1\n", table::get(table, "description"));
+          printf("\n\texpiration = %1\n", table::get(table, "expiration"));
+          printf("\n\tpermit_offline = %1\n", table::get(table, "permit_offline"));
+          printf("\n\toffline_duration = %1\n", table::get(table, "offline_duration"));
+          printf("\n\taccess_max = %1\n", table::get(table, "access_max"));
+          printf("\n\tflags = %1\n", table::get(table, "flags"));
+          printf("\n\tchecksum = %1\n\n", table::get(table, "checksum"));
+        }
+        else
+        {
+          printf("\nDelegate '%1' does not exist!\n", getList(delegatelist, j));
+        }
+      }
+    }
+    else
+    {
+      printf("\n- No Delegates exist\n");
+    }
+  }
+  
+  printf("\n- - - - - - - - - - - - - - - - - - - - -\n");
+  
+  printf("\nRE-ADDING DELEGATES FOR NEXT SCRIPT\n");
+  
+  /* Add First Delegate */
+  
+  table::clear(table);
+  table::set(table, "description", "First delegate");
+  table::set(table, "expiration", 0);
+  table::set(table, "permit_offline", 1);
+  table::set(table, "offline_duration", 24);
+  table::set(table, "access_max", 0);
+  table::set(table, "flags", 1);
+
+  a = dl::newDelegate(lib, session, user, delegate1, table);
+  if (a == 1)
+  {
+    printf("- Delegate [%1] added successfully\n", delegate1);
+  }
+  else
+  {
+    printf("- Error creating new Delegate\n");
+    return;
+  }
+  
+  /* Add Second Delegate */
+  
+  table::clear(table);
+  table::set(table, "description", "Second delegate");
+  table::set(table, "expiration", 0);
+  table::set(table, "permit_offline", 1);
+  table::set(table, "offline_duration", 24);
+  table::set(table, "access_max", 0);
+  table::set(table, "flags", 1);
+
+  a = dl::newDelegate(lib, session, user, delegate2, table);
+  if (a == 1)
+  {
+    printf("- Delegate [%1] added successfully\n", delegate2);
+  }
+  else
+  {
+    printf("- Error creating new Delegate\n");
+    return;
+  }
+  
+  printf("\n- - - GET DELEGATES (AFTER CHANGES) - - -\n");
+  
+  ds::getUsers(session, filter, &userlist);
+  
+  for (i = 0; i < countList(userlist); i++)
+  {
+    dl::getDelegates(session, getList(userlist,i), &delegatelist);
+    
+    if (countList(delegatelist) > 0)
+    {
+      for (j = 0; j < countList(delegatelist); j++)
+      {
+        delegateExists = dl::getDelegate(session, getList(userlist,i),
+                                         getList(delegatelist, j), table);
+        if (delegateExists == 1)
+        {
+          printf("\nOwner: [%1]\n", getList(userlist,i));
+          printf("\n\tDelegate: [%1]\n", getList(delegatelist, j));
+          printf("\n\tdescription = %1\n", table::get(table, "description"));
+          printf("\n\texpiration = %1\n", table::get(table, "expiration"));
+          printf("\n\tpermit_offline = %1\n", table::get(table, "permit_offline"));
+          printf("\n\toffline_duration = %1\n", table::get(table, "offline_duration"));
+          printf("\n\taccess_max = %1\n", table::get(table, "access_max"));
+          printf("\n\tflags = %1\n", table::get(table, "flags"));
+          printf("\n\tchecksum = %1\n\n", table::get(table, "checksum"));
+        }
+        else
+        {
+          printf("\nDelegate '%1' does not exist!\n", getList(delegatelist, j));
+        }
+      }
+    }
+    else
+    {
+      printf("\n- No Delegates exist\n");
+    }
+  }
+  
+  table::delete(table);
+  
+  printf("\nSample finished running\n");
+  
+  return 0;
+}
+
+replace procedure authenticate_dsdb_auto(session, user)
+{
+  int i, j, status;
+  int cntLine, cntChallenges, cntAuthChallenge, locateSeparator, locateCred;
+  list list2, challenges, auth_challenge, userinfo, challenges_info;
+  string buf, name, outbuf, username, credentials, challenges_name, challenges_pro, challenges_res, challenges_buf;
+  string credFile = "$(SAMPLE)/SampleData/credentials.txt";
+  bytearray specFile;
+  
+  specFile = file::readAll(credFile);
+  
+  /* Get User Info from credentials.txt */
+  
+  userinfo = split(specFile, "\n\n");
+  cntLine = countList(userinfo);
+  
+  /* Extract User info from credentials file and place in list */
+  
+  for (i = 0; i < cntLine; i++)
+  {
+    locateSeparator = locate(getList(userinfo,i), "=");
+    username = substr(getList(userinfo,i), 0, locateSeparator);
+    if (username == user)
+    {
+      locateCred = (locateSeparator + 1);
+      credentials = substr(getList(userinfo,i), locateCred, 500);
+      challenges = split(credentials, "||");
+      cntChallenges = countList(challenges);
+    }
+  }
+  
+  /* Start authentication */
+  
+  for (;;)
+  {
+    status = ds::authenticate(session);
+    
+    switch (status)
+    {
+      case 16:
+        printf("You are authorized\n");
+        return 1;
+        
+      case 1:
+        printf("You are not authorized\n");
+        ds::closeSession(session);
+        ds::closeDatabase();
+        return 0;
+        
+      case 512:
+        buf = ds::getChallenges(session);
+        auth_challenge = split(buf, "|");
+        cntAuthChallenge = countList(auth_challenge);
+        
+        for (i = 0; i < cntAuthChallenge; i++)
+        {
+          name = getList(auth_challenge, i);
+          
+          for (j = 0; j < cntChallenges; j++)
+          {
+            challenges_buf = getList(challenges,j);
+            challenges_info = split(challenges_buf, "|");
+            challenges_name = getList(challenges_info,0);
+            challenges_pro = getList(challenges_info, 1);
+            challenges_res = getList(challenges_info, 2);
+            
+            if (challenges_pro == name)
+            {
+              if(strlen(outbuf) > 0)
+              {
+                outbuf = concat(outbuf, "||");
+              }
+              
+              outbuf = concat(outbuf, challenges_pro, "|", challenges_res);
+            }
+            
+            clearList(challenges_info);
+          }
+        }
+        
+        ds::setResponses(session, outbuf);
+        break;
+        
+      default:
+        return 0;
+    }
+  }
+}
+
+delegates();

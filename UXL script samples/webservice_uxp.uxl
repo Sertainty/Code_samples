@@ -1,0 +1,820 @@
+/*! \copyright Sertainty Corporation, 2021.  All Rights Reserved.
+
+   \file     webservice_uxp.uxl
+
+   \brief    Demonstrates the ability to test UXP functionality by calling Sertainty Web Services from UXL.
+
+   \details  Opens an existing services database.
+   
+             Expects server access code to be 01234567890123456789012345678901.
+
+             Creates UXP
+
+             Adds data to the UXP
+
+             Reads virtual file and writes out to copy1.pdf
+
+             Closes UXP
+
+             Re-Opens UXP
+
+             Extracts file from UXP
+
+             Closes UXP
+
+   \author   Melvin Valdez de la Roca
+   \date     08/27/2021
+*/
+
+replace procedure webservice_uxp()
+{
+  int done = false;
+  int i, len, cnt_ch, appHandle, idHandle;
+  bytearray buffer, b64, bufFrom64;
+
+  string idName = "sampleid.iic";
+  string uxpName1 = "sample.uxp";
+  string uxpName2 = "sample2.uxp";
+  string dataName1 = "data.pdf";
+  string dataName2 = "data2.pdf";
+  string copyName1 = "copy1.pdf";
+  string copyName2 = "copy2.pdf";
+  string copyName3 = "expoCopy1.pdf";
+  string copyName4 = "expoCopy2.pdf";
+
+  string idFileSpec = concat("$(SAMPLE)/temp/", idName);
+  string uxpFileSpec1 = concat("$(SAMPLE)/temp/", uxpName1);
+  string uxpFileSpec2 = concat("$(SAMPLE)/temp/", uxpName2);
+  string dataPdfSpec1 = concat("$(SAMPLE)/SampleData/", dataName1);
+  string dataPdfSpec2 = concat("$(SAMPLE)/SampleData/", dataName2);
+  string copySpec1 = concat("$(SAMPLE)/temp/", copyName1);
+  string copySpec2 = concat("$(SAMPLE)/temp/", copyName2);
+  string copySpec3 = concat("$(SAMPLE)/temp/", copyName3);
+  string copySpec4 = concat("$(SAMPLE)/temp/", copyName4);
+
+  table intable, outtable;
+  list challenges;
+  string status, session, buf_ch, prompt_ch, response_ch, outbuf_ch, test_option;
+  string key = "01234567890123456789012345678901";
+  string username = "SampleUser@myemail.com";
+  string data;
+
+  intable = table::create();
+  outtable = table::create();
+
+  table::set(intable, "username", username);
+  table::set(intable, "stop_time", 0);
+
+  test_option = "local";
+
+  switch (test_option)
+  {
+    case "local":
+      printf("\nTesting local server\n\n");
+      string url = "file://$(SAMPLE)/temp/services.db";
+      break;
+
+    case "remote":
+      printf("\nTesting remote server\n\n");
+      string url = "http://so-osx.example.com:5000/dataservices";
+      break;
+
+    default:
+      printf("\nYou did not select an available option!\n");
+      return;
+  }
+
+  print url;
+  print idFileSpec;
+  print uxpFileSpec1;
+  print uxpFileSpec2;
+  print copySpec1;
+  print copySpec2;
+  print copySpec3;
+  print copySpec4;
+
+  printf("\nOpening services session ...\n");
+
+  status = util::webService(url,&session,key,"ds::openSession",intable,outtable);
+  if (status != 1)
+  {
+    printf("Error: %1\n", errorstring);
+    return;
+  }
+
+  printf("Authenticating ...\n");
+
+  /*
+    Authenticate into the DS DB with an existing username.
+   */
+
+  printf("\nCredentials necessary to access database:\n");
+  printf("  Username = SampleUser@myemail.com\n");
+  printf("  Challenge 1 = Response 1\n");
+  printf("  Challenge 2 = Response 2\n");
+  printf("  ... \n");
+  printf("  Challenge 10 = Response 10\n");
+
+  for (;;)
+  {
+    printf("Start of loop\n");
+
+    status = util::webService(url,&session,key,"ds::authenticate",intable,outtable);
+    if (status != 1)
+    {
+      printf("Error: %1\n", errorstring);
+      return;
+    }
+
+    printf("Authentication call status = %1\n", status);
+    
+    data = table::get(outtable, "authStatus");
+    if (data != 512)
+    {
+      printf("\nYou are authorized!\n");
+      break;
+    }
+
+    printf("Authentication status = %1\n", data);
+    
+    status = util::webService(url,&session,key,"ds::getChallenges",intable,outtable);
+    if (status != 1)
+    {
+      printf("Error: %1\n", errorstring);
+      return;
+    }
+
+    printf("GetChallengs call status = %1\n", status);
+    
+    buf_ch = table::get(outtable, "challenges");
+    challenges = split(buf_ch, "||");
+    cnt_ch = countList(challenges);
+
+    for (i = 0; i < cnt_ch; i++)
+    {
+      prompt_ch = getList(challenges, i);
+
+      if (strlen(outbuf_ch) > 0)
+      {
+        outbuf_ch = concat(outbuf_ch, "||");
+      }
+
+      if (toUpper(prompt_ch) == "USERNAME")
+      {
+        response_ch = username;
+      }
+      else
+      {
+        response_ch = concat("Response ", substr(prompt_ch, 10, -1));
+      }
+
+      outbuf_ch = concat(outbuf_ch, prompt_ch, "|", response_ch);
+    }
+
+    table::clear(intable);
+    table::set(intable, "responses", outbuf_ch);
+
+    status = util::webService(url,&session,key,"ds::setResponses",intable,outtable);
+    if (status != 1)
+    {
+      printf("Error: %1\n", errorstring);
+      return;
+    }
+
+    printf("SetResponses call status = %1\n", status);
+  }
+
+  printf("\n< First Test: Creating a new UXP and adding files >\n");
+
+  if (test_option == "remote")
+  {
+    printf("\n  Uploading ID and data files to Server ...\n");
+
+    buffer = file::readAll(idFileSpec);
+    b64 = util::toBase64(buffer);
+
+    table::clear(intable);
+    table::set(intable, "filename", idName);
+    table::set(intable, "buffer", b64);
+    table::set(intable, "options", "Replace");
+
+    status = util::webService(url,&session,key,"sf::uploadFile",intable,outtable);
+    if (status != 1)
+    {
+      printf("Error: %1\n", errorstring);
+      return;
+    }
+
+    buffer = file::readAll(dataPdfSpec1);
+    b64 = util::toBase64(buffer);
+
+    table::clear(intable);
+    table::set(intable, "filename", dataName1);
+    table::set(intable, "buffer", b64);
+    table::set(intable, "options", "Replace");
+
+    status = util::webService(url,&session,key,"sf::uploadFile",intable,outtable);
+    if (status != 1)
+    {
+      printf("Error: %1\n", errorstring);
+      return;
+    }
+
+    buffer = file::readAll(dataPdfSpec2);
+    b64 = util::toBase64(buffer);
+
+    table::clear(intable);
+    table::set(intable, "filename", dataName2);
+    table::set(intable, "buffer", b64);
+    table::set(intable, "options", "Replace");
+
+    status = util::webService(url,&session,key,"sf::uploadFile",intable,outtable);
+    if (status != 1)
+    {
+      printf("Error: %1\n", errorstring);
+      return;
+    }
+  }
+
+  printf("\n  Creating new UXP inside Server ...\n");
+
+  table::clear(intable);
+
+  if (test_option == "remote")
+  {
+    table::set(intable, "filename", uxpName1);
+  }
+  else
+  {
+    table::set(intable, "filename", uxpFileSpec1);
+  }
+
+  if (test_option == "remote")
+  {
+    table::set(intable, "id", idName);
+  }
+  else
+  {
+    table::set(intable, "id", idFileSpec);
+  }
+
+  clearList(inlist);
+  appendList(inlist, uxpFS);
+  appendList(inlist, idFS);
+  appendList(inlist, options_1);
+
+  table::set(intable, "filename", dataName1);
+  table::set(intable, "options", "IDFile|Replace");
+
+  status = util::webService(url,&session,key,"sf::newUxp",intable,outtable);
+  if (status != 1)
+  {
+    printf("Error: %1\n", errorstring);
+    return;
+  }
+
+  printf("\n  Adding files to UXP ...\n");
+
+  appH = table::get(outtable, "handle");
+
+  table::clear(intable);
+
+  table::set(intable, "handle", appH);
+  table::set(intable, "name", dataName1);
+
+  if (test_option == "remote")
+  {
+    table::set(intable, "filename",dataName1);
+  }
+  else
+  {
+    table::set(intable, "filename",dataPdfSpec1);
+  }
+
+  table::set(intable, "pagesize", -1);
+  table::set(intable, "cachesize", -1);
+  table::set(intable, "options", "Compress");
+
+  status = util::webService(url,&session,key,"sf::addFile",intable,outtable);
+  if (status != 1)
+  {
+    printf("Error: %1\n", errorstring);
+    return;
+  }
+
+  table::clear(intable);
+
+  table::set(intable, "handle", appH);
+  table::set(intable, "name", dataName2);
+
+  if (test_option == "remote")
+  {
+    table::set("filename",dataName2);
+  }
+  else
+  {
+    table::set("filename",dataPdfSpec2);
+  }
+
+  table::set(intable, "pagesize", -1);
+  table::set(intable, "cachesize", -1);
+  table::set(intable, "options", "");
+
+  status = util::webService(url,&session,key,"sf::addFile",intable,outtable);
+  if (status != 1)
+  {
+    printf("Error: %1\n", errorstring);
+    return;
+  }
+
+  printf("\n  Opening Virtual File ...\n");
+
+  table::clear(intable);
+
+  table::set(intable, "handle", appH);
+  table::set(intable, "virSpec", dataName1);
+
+  status = util::webService(url,&session,key,"sf::openFile",intable,outtable);
+  if (status != 1)
+  {
+    printf("Error: %1\n", errorstring);
+    return;
+  }
+
+  fileH = table::get(outtable, "fileHandle");
+
+  printf("\n  Reading %1 in loop...", dataName1);
+
+  table::clear(intable);
+
+  table::set(intable, "handle", appH);
+  table::set(intable, "fileHandle", fileH);
+  table::set(intable, "len", -1);
+
+  string fp = file::open(copySpec1, "wb");
+
+  status = util::webService(url,&session,key,"sf::readFile",intable,outtable);
+  if (status != 1)
+  {
+    printf("Error: %1\n", errorstring);
+    return;
+  }
+
+  buffer = table::get(outtable, "buffer");
+  buffer = util::fromBase64(buffer);
+  len = strlen(buffer);
+  file::write(buffer, len, 1, fp);
+  file::close(fp);
+
+  printf("finished reading %1\n", dataName1);
+  printf("    - Created %1\n", copyName1);
+
+  table::clear(intable);
+
+  table::set(intable, "handle", appH);
+  table::set(intable, "fileHandle", fileH);
+
+  status = util::webService(url,&session,key,"sf::closeFile",intable,outtable);
+  if (status != 1)
+  {
+    printf("Error: %1\n", errorstring);
+    return;
+  }
+
+  printf("\n  Closing UXP ...\n");
+
+  table::clear(intable);
+
+  table::set(intable, "handle", appH);
+
+  status = util::webService(url,&session,key,"sf::closeUxp",intable,outtable);
+  if (status != 1)
+  {
+    printf("Error: %1\n", errorstring);
+    return;
+  }
+
+  printf("\n  Re-opening UXP ...\n");
+
+  table::clear(intable);
+
+  if (test_option == "remote")
+  {
+    table::set(intable, "filename", uxpName1);
+  }
+  else
+  {
+    table::set(intable, "filename", uxpFileSpec1);
+  }
+
+  table::set(intable, "mode", "ShareAll");
+  table::set(intable, "responsepairs", concat("USERNAME|",username));
+
+  status = util::webService(url,&session,key,"sf::openUxp",intable,outtable);
+  if (status != 1)
+  {
+    printf("Error: %1\n", errorstring);
+    return;
+  }
+
+  uxpH = table::get(outtable, "handle");
+
+  clearList(challenges);
+
+  printf("\n  Authenticating ...\n");
+
+  for (;;)
+  {
+    table::clear(intable);
+    table::set(intable, "handle", uxpH);
+
+    status = util::webService(url,&session,key,"sf::authenticate",intable,outtable);
+    if (status != 1)
+    {
+      printf("Error: %1\n", errorstring);
+      return;
+    }
+
+    data = table::get(outtable, "authStatus");
+    if (data != 512)
+    {
+      printf("    - Authorized\n");
+      break;
+    }
+
+    table::clear(intable);
+    table::set(intable, "handle", uxpH);
+
+    status = util::webService(url,&session,key,"sf::getChallenges",intable,outtable);
+    if (status != 1)
+    {
+      printf("Error: %1\n", errorstring);
+      return;
+    }
+
+    buf_ch = table::get(outtable, "challenges");
+
+    challenges = split(buf_ch, "|");
+    cnt_ch = countList(challenges);
+
+    for (i = 0; i < cnt_ch; i++)
+    {
+      prompt_ch = getList(challenges, i);
+
+      if (strlen(outbuf_ch) > 0)
+      {
+        outbuf_ch = concat(outbuf_ch, "||");
+      }
+
+      if (toUpper(prompt_ch) == "USERNAME")
+      {
+        response_ch = "SampleUser@myemail.com";
+      }
+      else
+      {
+        response_ch = concat("Response ", substr(prompt_ch, 10, -1));
+      }
+
+      outbuf_ch = concat(outbuf_ch, prompt_ch, "|", response_ch);
+    }
+
+    table::clear(intable);
+    table::set(intable, "handle", uxpH);
+    table::set(intable, "responses", outbuf_ch);
+
+    status = util::webService(url,&session,key,"sf::setResponses",intable,outtable);
+    if (status != 1)
+    {
+      printf("Error: %1\n", errorstring);
+      return;
+    }
+  }
+
+  printf("\n  Extracting %1 from UXP to %2 ...\n", dataName2, copyName2);
+
+  table::clear(intable);
+  table::set(intable, "handle", uxpH);
+  table::set(intable, "virspec", dataName2);
+
+  outFS.name = "outspec";
+  if (test_option == "remote")
+  {
+    table::set(intalbe, "outspec", copyName2);
+  }
+  else
+  {
+    table::set(intalbe, "outspec", copySpec2);
+  }
+
+  table::set(intable, "options", "Replace");
+
+  status = util::webService(url,&session,key,"sf::exportFile",intable,outtable);
+  if (status != 1)
+  {
+    printf("Error: %1\n", errorstring);
+    return;
+  }
+
+  if (test_option == "remote")
+  {
+    printf("\n  Downloading file '%1' from Server ...\n", copyName2);
+
+    table::clear(intable);
+    table::set(intable, "filename", copyName2);
+
+    status = util::webService(url,&session,key,"sf::downloadFile",intable,outtable);
+    if (status != 1)
+    {
+      printf("Error: %1\n", errorstring);
+      return;
+    }
+
+    buffer = table::get(outtable, "buffer");
+    bufFrom64 = util::fromBase64(buffer);
+    file::writeAll(copySpec2, bufFrom64, "Replace");
+  }
+
+  printf("\n  Closing UXP ...\n");
+
+  table::clear(intable);
+  table::set(intable, "handle", uxpH);
+
+  status = util::webService(url,&session,key,"sf::closeUxp",intable,outtable);
+  if (status != 1)
+  {
+    printf("Error: %1\n", errorstring);
+    return;
+  }
+
+  if (test_option == "remote")
+  {
+    clearList(inlist);
+
+    printf("\n  Downloading UXP 'sample.uxp' from Server ...\n");
+
+    table::clear(intable);
+    table::set(intable, "filename", uxpName1);
+
+    status = util::webService(url,&session,key,"sf::downloadFile",intable,outtable);
+    if (status != 1)
+    {
+      printf("Error: %1\n", errorstring);
+      return;
+    }
+
+    buffer = table::get(outtable, "buffer");
+    bufFrom64 = util::fromBase64(buffer);
+    file::writeAll(uxpFileSpec1, bufFrom64, "Replace");
+  }
+
+  /* Reverse - Create UXP locally, Upload and open UXP within Server, Download files from UXP to local directory */
+  printf("\n\n< Second Test: Opening existing UXP and extracting files >\n");
+
+  printf("\n  Creating new UXP ...\n");
+
+  appHandle = sf::newUxp(uxpFileSpec2, idFileSpec, "IDFile|Replace");
+  if (errorstring)
+  {
+    printf("Error creating new UXP: %1\n", errorstring);
+    return;
+  }
+
+  sf::addFile(appHandle, dataName1, dataPdfSpec1, -1, -1, "Compress");
+  if (errorstring)
+  {
+    printf("Error adding data to UXP: %1\n", errorstring);
+    return;
+  }
+
+  sf::addFile(appHandle, dataName2, dataPdfSpec2, -1, -1, 0);
+  if (errorstring)
+  {
+    printf("Error adding data to UXP: %1\n", errorstring);
+    return;
+  }
+
+  sf::closeUxp(appHandle);
+
+  if (test_option == "remote")
+  {
+    clearList(inlist);
+
+    printf("\n  Uploading UXP '%1' to Server ...\n", uxpName2);
+
+    table::clear(intable);
+    table::set(intable, "filename", uxpName12);
+
+    buffer = file::readAll(uxpFileSpec2);
+    b64 = util::toBase64(buffer);
+
+    table::set(intable, "buffer", b64);
+    table::set(intable, "options", "Replace");
+
+    status = util::webService(url,&session,key,"sf::uploadFile",intable,outtable);
+    if (status != 1)
+    {
+      printf("Error: %1\n", errorstring);
+      return;
+    }
+  }
+
+  printf("\n  Re-opening UXP inside Server...\n");
+
+  table::clear(intable);
+
+  if (test_option == "remote")
+  {
+    table::set(intable, "filename", uxpName12);
+  }
+  else
+  {
+    table::set(intable, "filename", uxpFileSpec2);
+  }
+
+  table::set(intable, "mode", "ShareAll");
+  table::set(intable, "responses", concat("USERNAME|",username));
+
+  status = util::webService(url,&session,key,"sf::openUxp",intable,outtable);
+  if (status != 1)
+  {
+    printf("Error: %1\n", errorstring);
+    return;
+  }
+
+  uxpH = table::get(outtable, "handle");
+
+  clearList(challenges);
+
+  printf("\n  Authenticating ...\n");
+
+  for (;;)
+  {
+    table::clear(intable);
+    table::set(intable, "handle", uxpH);
+
+    status = util::webService(url,&session,key,"sf::authenticate",intable,outtable);
+    if (status != 1)
+    {
+      printf("Error: %1\n", errorstring);
+      return;
+    }
+
+    data = table::get(outtable, "authStatus");
+    if (data != 512)
+    {
+      printf("    - Authorized\n");
+      break;
+    }
+
+    table::clear(intable);
+    table::set(intable, "handle", uxpH);
+
+    status = util::webService(url,&session,key,"sf::getChallenges",intable,outtable);
+    if (status != 1)
+    {
+      printf("Error: %1\n", errorstring);
+      return;
+    }
+
+    buf_ch = table::get(outtable, "challenges");
+
+    challenges = split(buf_ch, "|");
+    cnt_ch = countList(challenges);
+
+    for (i = 0; i < cnt_ch; i++)
+    {
+      prompt_ch = getList(challenges, i);
+
+      if (strlen(outbuf_ch) > 0)
+      {
+        outbuf_ch = concat(outbuf_ch, "||");
+      }
+
+      if (toUpper(prompt_ch) == "USERNAME")
+      {
+        response_ch = "SampleUser@myemail.com";
+      }
+      else
+      {
+        response_ch = concat("Response ", substr(prompt_ch, 10, -1));
+      }
+
+      outbuf_ch = concat(outbuf_ch, prompt_ch, "|", response_ch);
+    }
+
+    table::clear(intable);
+    table::set(intable, "handle", uxpH);
+    table::set(intable, "responses", outbuf_ch);
+
+    status = util::webService(url,&session,key,"sf::setResponses",intable,outtable);
+    if (status != 1)
+    {
+      printf("Error: %1\n", errorstring);
+      return;
+    }
+  }
+
+  printf("\n  Extracting %1 from UXP to %2 ...\n", dataName1, copyName3);
+
+  table::clear(intable);
+  table::set(intable, "handle", uxpH);
+  table::set(intable,"virspec", dataName1);
+
+  outFS.name = "outspec";
+  if (test_option == "remote")
+  {
+    table::set(intable,"outspec", copyName3);
+  }
+  else
+  {
+    table::set(intable,"outspec", copySpec3);
+  }
+
+  table::set(intable,"options", "Replace");
+
+  status = util::webService(url,&session,key,"sf::exportFile",intable,outtable);
+  if (status != 1)
+  {
+    printf("Error: %1\n", errorstring);
+    return;
+  }
+
+  printf("\n  Extracting %1 from UXP to %2 ...\n", dataName2, copyName4);
+
+  table::clear(intable);
+  table::set(intable, "handle", uxpH);
+  table::set(intable,"virspec", dataName2);
+
+  outFS.name = "outspec";
+  if (test_option == "remote")
+  {
+    table::set(intable,"outspec", copyName4);
+  }
+  else
+  {
+    table::set(intable,"outspec", copySpec4);
+  }
+
+  table::set(intable,"options", "Replace");
+
+  status = util::webService(url,&session,key,"sf::exportFile",intable,outtable);
+  if (status != 1)
+  {
+    printf("Error: %1\n", errorstring);
+    return;
+  }
+
+  printf("\n  Closing UXP ...\n");
+
+  table::clear(intable);
+  table::set(intable, "handle", uxpH);
+
+  status = util::webService(url,&session,key,"sf::closeUxp",intable,outtable);
+  if (status != 1)
+  {
+    printf("Error: %1\n", errorstring);
+    return;
+  }
+
+  clearList(inlist);
+
+  if (test_option == "remote")
+  {
+    printf("\n  Downloading files '%1' and '%2' from Server ...\n", copyName3, copyName4);
+
+    table::clear(intable);
+    table::set(intable, "filename", copyName3);
+
+    status = util::webService(url,&session,key,"sf::downloadFile",intable,outtable);
+    if (status != 1)
+    {
+      printf("Error: %1\n", errorstring);
+      return;
+    }
+
+    buffer = table::get(outtable, "buffer");
+    bufFrom64 = util::fromBase64(buffer);
+    file::writeAll(copySpec3, bufFrom64, "Replace");
+
+    table::clear(intable);
+    table::set(intable, "filename", copyName4);
+
+    status = util::webService(url,&session,key,"sf::downloadFile",intable,outtable);
+    if (status != 1)
+    {
+      printf("Error: %1\n", errorstring);
+      return;
+    }
+
+    buffer = table::get(outtable, "buffer");
+    bufFrom64 = util::fromBase64(buffer);
+    file::writeAll(copySpec4, bufFrom64, "Replace");
+  }
+
+  printf("\nSample finished running\n");
+
+  table::delete(intable);
+  table::delete(outtable);
+}
+
+webservice_uxp();

@@ -1,0 +1,94 @@
+/*!
+    \copyright Sertainty Corporation, 2021. All Rights Reserved.
+
+    \file     export.uxl
+
+    \brief    This sample shows how to extract a document from a UXP.
+
+    \author   Melvin Valdez de la Roca
+    \date     09/16/2020
+
+    \note     Application expects to find the necessary source files in the current working folder.
+ */
+
+replace procedure authenticate_uxp(sf)
+{
+  int i, cnt, status;
+  list challenges;
+  string buf, name, prompt, response, outbuf;
+
+  for (;;)
+  {
+    status = sf::authenticate(sf);
+    if (status != 512)
+      break;
+      
+    buf = sf::getChallenges(sf);
+    challenges = split(buf, "|");
+    cnt = countList(challenges);
+
+    for (i = 0; i < cnt; i++)
+    {
+      prompt = getList(challenges,i);
+
+      if (strlen(outbuf) > 0)
+      {
+        outbuf = concat(outbuf, "||");
+      }
+
+      if (toUpper(prompt) == "USERNAME")
+      {
+        response = "SampleUser@myemail.com";
+      }
+      else
+      {
+        response = concat("Response ", substr(prompt,10, -1));
+      }
+
+      outbuf = concat(outbuf,prompt,"|",response);
+    }
+
+    sf::setResponses(data, outbuf);
+  }
+   
+  return status;
+}
+
+replace procedure export()
+{
+  int sf, status;
+  string uxpFileSpec = "$(SAMPLE)/temp/sample.uxp";
+  string exportFileSpec = "$(SAMPLE)/temp/export.pdf";
+
+  printf("\nOpening UXP in file sample.uxp\n\n");
+
+  sf = sf::openUxp(uxpFileSpec);
+  if (errorstring)
+  {
+    printf("\nError opening UXP: %1\n", errorstring);
+    return;
+  }
+
+  status = authenticate_uxp(sf);
+  if (status != 16)
+  {
+    printf("You are not authorized\n");
+    return;
+  }
+  else
+  {
+    printf("You are authorized\n");
+  }
+
+  printf("\nExporting document to file export.pdf\n");
+
+  sf::exportFile(sf, "data.pdf", exportFileSpec, "replace");
+
+  sf::closeUxp(sf);
+
+  printf("\nSample finished running\n");
+
+  return 0;
+}
+
+export();

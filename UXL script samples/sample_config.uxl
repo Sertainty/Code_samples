@@ -1,0 +1,51 @@
+/*!
+    \copyright Sertainty Corporation, 2020.  All Rights Reserved.
+
+    \file     sample_config.uxl
+
+    \brief    Sample program using UXL that demonstrates fetching current machine's location information using the Sertainty SDK. 
+              Similarly, the machine's network interface information can also be fetched from the machine's configuration.
+
+              This sample only demonstrates location information for brevity.
+
+    \author   Melvin Valdez de la Roca
+    \date     07/15/2020
+
+    \note     Application expects to find the necessary source files in the current working folder.
+ */
+
+replace procedure sample_config()
+{
+  bytearray buffer;
+  int loc1, loc2;
+  string location, zipcode;
+
+  printf("\nSample UXL Config/Location Application\n");
+
+  /* Load the current machine configuration to extract location and network information from */
+
+  sf::showConfiguration(buffer);
+  if (errorstring)
+  {
+    printf("Error getting Config: %1\n", errorstring);
+  }
+
+  /* Extract location config from machine config */
+
+  loc1 = locate(buffer, "  Address");
+  location = substr(buffer, loc1, 10000);
+
+  /* Get the Zipcode from location config */
+
+  loc2 = locate(location, "  Zipcode");
+  zipcode = substr(location, loc2 + 19, 5);
+
+  printf("%1\n\n", concat("\n  Zipcode Property from location: ", zipcode));
+  printf("%1\n", location);
+
+  printf("Sample finished running\n");
+
+  return 0;
+}
+
+sample_config();

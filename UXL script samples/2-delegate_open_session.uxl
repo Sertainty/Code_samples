@@ -1,0 +1,181 @@
+/*!
+ \copyright Sertainty Corporation, 2021. All Rights Reserved.
+ 
+ \file     2-delegate_open_session.uxl
+ 
+ \brief    This sample code authenticates into the newly created database.
+ 
+ \author   Melvin Valdez de la Roca
+ \date     03/08/2021
+ 
+ \note     Application expects to find the necessary source files in the current working folder.
+ */
+
+/* 
+ DATA SERVICES UXL CALLS USED:
+ - ds::authenticate
+ - ds::closeSession
+ - ds::closeDatabase
+ - ds::getChallenges
+ - ds::setResponses
+ - ds::openDatabase
+ - ds::openSession
+ 
+ - ds::setServer
+ - ds::getServer
+ */
+
+replace procedure open_session()
+{
+  int a, session, status;
+  string user = "SampleUser@myemail.com";
+  string buffer, test_option;
+  
+  printf("\n\nSample UXL Delegate Application using ID\n\n");
+  
+  test_option = "local";
+  
+  if (test_option == "local")
+  {
+    printf("Testing local server\n\n");
+    string serverSpec = "file://services.db";
+  }
+  else if (test_option == "remote")
+  {
+    printf("Testing remote server\n\n");
+    string serverSpec = "http://so-osx.example.com:5000/dataservices";
+  }
+  else
+  {
+    printf("\nYou did not select an available option!\n");
+    return;
+  }
+  
+  /* Open the database, DS DB session, and authenticate */
+  
+  ds::openDatabase(0);
+  if (errorstring)
+  {
+    printf("Error opening data services database: %1\n", errorstring);
+    return;
+  }
+  
+  session = ds::openSession(user);
+  if (errorstring)
+  {
+    printf("Error opening session for data services database: %1\n", errorstring);
+    return;
+  }
+  
+  authenticate_dsdb_auto(session, user);
+  
+  /* Clean up */
+  ds::closeSession(session);
+  if (errorstring)
+  {
+    printf("Error closeSession() %1\n", errorstring);
+    return;
+  }
+  
+  ds::closeDatabase();
+  if (errorstring)
+  {
+    printf("Error closeDatabase() %1\n", errorstring);
+    return;
+  }
+  
+  printf("\nSample finished running\n");
+  
+  return 0;
+}
+
+replace procedure authenticate_dsdb_auto(session, user)
+{
+  int i, j, status;
+  int cntLine, cntChallenges, cntAuthChallenge, locateSeparator, locateCred;
+  list list2, challenges, auth_challenge, userinfo, challenges_info;
+  string buf, name, outbuf, username, credentials, challenges_name, challenges_pro, challenges_res, challenges_buf;
+  string credFile = "$(SAMPLE)/SampleData/credentials.txt";
+  bytearray specFile;
+  
+  specFile = file::readAll(credFile);
+  
+  /* Get User Info from credentials.txt */
+  
+  userinfo = split(specFile, "\n\n");
+  cntLine = countList(userinfo);
+  
+  /* Extract User info from credentials file and place in list */
+  
+  for (i = 0; i < cntLine; i++)
+  {
+    locateSeparator = locate(getList(userinfo,i), "=");
+    username = substr(getList(userinfo,i), 0, locateSeparator);
+    if (username == user)
+    {
+      locateCred = (locateSeparator + 1);
+      credentials = substr(getList(userinfo,i), locateCred, 500);
+      challenges = split(credentials, "||");
+      cntChallenges = countList(challenges);
+    }
+  }
+  
+  /* Start authentication */
+  
+  for (;;)
+  {
+    status = ds::authenticate(session);
+    
+    switch (status)
+    {
+      case 16:
+        printf("You are authorized\n");
+        return 1;
+        
+      case 1:
+        printf("You are not authorized\n");
+        ds::closeSession(session);
+        ds::closeDatabase();
+        return 0;
+        
+      case 512:
+        buf = ds::getChallenges(session);
+        auth_challenge = split(buf, "|");
+        cntAuthChallenge = countList(auth_challenge);
+        
+        for (i = 0; i < cntAuthChallenge; i++)
+        {
+          name = getList(auth_challenge, i);
+          
+          for (j = 0; j < cntChallenges; j++)
+          {
+            challenges_buf = getList(challenges,j);
+            challenges_info = split(challenges_buf, "|");
+            challenges_name = getList(challenges_info,0);
+            challenges_pro = getList(challenges_info, 1);
+            challenges_res = getList(challenges_info, 2);
+            
+            if (challenges_pro == name)
+            {
+              if(strlen(outbuf) > 0)
+              {
+                outbuf = concat(outbuf, "||");
+              }
+              
+              outbuf = concat(outbuf, challenges_pro, "|", challenges_res);
+            }
+            
+            clearList(challenges_info);
+          }
+        }
+        
+        ds::setResponses(session, outbuf);
+        break;
+        
+      default:
+        return 0;
+    }
+  }
+}
+
+open_session();

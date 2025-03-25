@@ -1,0 +1,190 @@
+/*! 
+   \copyright Sertainty Corporation, 2021.  All Rights Reserved.
+
+   \file     webservice.uxl
+
+   \brief    Demonstrates the ability to call Sertainty Web Services from UXL.
+
+   \details  Opens an existing services database.
+   
+             Selects items from the database.
+             
+             Expects server access code to be 01234567890123456789012345678901.
+
+   \author   Greg Smith
+   \date     05/20/2021
+*/
+
+replace procedure callWebService()
+{
+  int i, cnt_ch;
+  string status, session, test_option;
+  list inlist, outlist, list_ch, challenges;
+  ValuePair pair, data, buf_pair, ch_pair, name;
+  string buf_ch, name_ch, prompt_ch, response_ch, outbuf_ch;
+  
+  string key = "01234567890123456789012345678901";
+
+  test_option = "local";
+
+  if (test_option == "local")
+  {
+      printf("\nTesting local server\n\n");
+      string url = "file://$(SAMPLE)/temp/services.db";
+  }
+  else if (test_option == "remote")
+  {
+      printf("\nTesting remote server\n\n");
+      string url = "http://so-osx.example.com:5000/dataservices";
+  }
+  else
+  {
+      printf("\nYou did not select an available option!\n");
+      return;
+  }
+
+  printf("Getting version ... \n");
+  util::webService(url,&session,key,"ds::getVersion",inlist,&outlist);
+  print outlist;
+
+  pair.name = "username";
+  pair.value = "sampleuser@myemail.com";
+  
+  appendList(inlist, pair);
+  
+  printf("\nOpening session ...\n");
+  
+  status = util::webService(url,&session,key,"ds::openSession",inlist,&outlist);
+  if (status != 1)
+  {
+    printf("Error: %1\n", errorstring);
+    return;
+  }
+                            
+  printf("Authenticating ...\n");
+
+  /*
+      Authenticate into the DS DB with an existing username.
+  */
+  
+  printf("\nCredentials necessary to access database:\n");
+  printf("  Username = SampleUser@myemail.com\n");
+  printf("  Challenge 1 = Response 1\n");
+  printf("  Challenge 2 = Response 2\n");
+  printf("  ... \n");
+  printf("  Challenge 10 = Response 10\n");
+  
+  for (;;)
+  {
+    status = util::webService(url,&session,key,"ds::authenticate",inlist,&outlist);
+    if (status != 1)
+    {
+        printf("Error: %1\n", errorstring);
+        return;
+    }
+
+    data = getList(outlist, 0);
+    if (data.value != 512)
+    {
+        printf("\nYou are authorized!\n");
+        break;
+    }
+
+    status = util::webService(url,&session,key,"ds::getChallenges",inlist,&outlist);
+    if (status != 1)
+    {
+        printf("Error: %1\n", errorstring);
+        return;
+    }
+
+    buf_pair = getList(outlist,0);
+    buf_ch = buf_pair.value;
+    challenges = split(buf_ch, "||");
+    cnt_ch = countList(challenges);
+
+    for (i = 0; i < cnt_ch; i++)
+    {
+        list_ch = split(getList(challenges, i), "|");
+        name_ch = getList(list_ch, 0);
+        prompt_ch = getList(list_ch, 1);
+
+        if (strlen(outbuf_ch) > 0)
+        {
+            outbuf_ch = concat(outbuf_ch, "||");
+        }
+
+        if (name_ch == "USERNAME")
+        {
+            response_ch = username;
+        }
+        else
+        {
+            response_ch = concat("Response ", substr(prompt_ch, 10, -1));
+        }
+
+        outbuf_ch = concat(outbuf_ch, name_ch, "|", prompt_ch, "|", response_ch);
+    }
+
+    ch_pair.name = "responses";
+    ch_pair.value = outbuf_ch;
+
+    clearList(inlist);
+    appendList(inlist, ch_pair);
+
+    status = util::webService(url,&session,key,"ds::setResponses",inlist,&outlist);
+    if (status != 1)
+    {
+        printf("Error: %1\n", errorstring);
+        return;
+    }   
+  }
+
+  printf("\nGetting agent status\n");
+  
+  status = util::webService(url,&session,key,"agent::ping",inlist,&outlist);
+  if (status != 1)
+  {
+    printf("Error: %1\n", errorstring);
+    return;
+  }
+
+  print outlist;
+
+  printf("\nGetting service database user list\n");
+  
+  clearList(inlist);
+  
+  status = util::webService(url,&session,key,"ds::getUsers",inlist,&outlist);
+  if (status != 1)
+  {
+    printf("Error: %1\n", errorstring);
+    return;
+  }
+
+  print outlist;
+
+  printf("\nGetting public delegates\n");
+  
+  clearList(inlist);
+  
+  pair.name = "owner";
+  pair.value = "sampleuser@myemail.com";
+  
+  appendList(inlist, pair);
+  
+  status = util::webService(url,&session,key,
+                            "dl::getPublicDelegates",
+                            inlist,
+                            &outlist);
+  if (status != 1)
+  {
+    printf("Error: %1\n", errorstring);
+    return;
+  }
+
+  print outlist;
+  
+  printf("\nSample finished running\n");
+}
+
+callWebService();

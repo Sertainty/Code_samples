@@ -1,0 +1,484 @@
+/*!
+    \copyright Sertainty Corporation, 2020.  All Rights Reserved.
+
+   \file     sample_workflow_table::get(table, "uxl
+
+   \brief    Demonstrates the features of a UXP Sertainty Services database using UXL scripting.
+
+   \details  Sertainty Services database is a UXP Object that permits SQL access. The database is used to manage Users and Delegate Identities.
+
+             A Delegate can be used to allow a User to access a UXP Object without having an identity embedded within the UXP Object.  
+             Access is still controlled by the data owner, but is managed via the Sertainty Services database utilized by Delegate Service.
+
+             To work propertly, the current working Delegate should be the example data folder.
+
+   \author   Greg Smith
+   \date     04-feb-2020
+
+   \edited   Melani Smith Weed
+   \date     24-jul-2020
+   
+   \edited   Melvin Valdez de la Roca
+   \date     23-mar-2021
+*/
+
+/* Comment out using UXP as database */
+
+#define SAMPLE_MYSQL
+#define LOCAL_MYSQL
+
+replace procedure sample_workflow_delegate()
+{
+  list outlist;
+  string filter;
+  ValuePair pair;
+  int i, data;
+  on return
+  {
+    ds::closeSession(session);
+    ds::closeDatabase();
+    sf::closeUxp(data);
+  }
+
+  bytearray b1, idbuf, id, id2;
+  int status, done, db, session, isAuthorized;
+
+  printf("\nSample UXL script for UXP delegate Management\n\n");
+
+  string user1 = "SampleUser@myemail.com";
+  string user2 = "SampleUser2@myemail.com";
+  string delegate1 = "DelegateExample";
+  string mysql_params = "so-osx.example.com|3306|uxpds";
+  table table;
+  
+  table = table::create();
+
+  #ifdef LOCAL_MYSQL
+  mysql_params = "localhost|3306|test$2021";
+  #endif
+  
+  /*
+      Create a new ID from the sampleid.xml ID definition. We
+      are using the sample ID to create the Sertainty Services database.
+  */
+
+  printf("Creating sample ID\n");
+
+  idbuf = file::readAll("$(SAMPLE)/SampleData/sampleid.xml");
+
+  id = id::newIdFromDocument(idbuf);
+
+  file::writeAll("$(SAMPLE)/temp/sampleid.iic", id, "replace");
+
+  /* Load UXP delegate code and create a db with SYSADMIN */
+
+  printf("Creating Sertainty Services database\n");
+
+#ifdef SAMPLE_MYSQL
+  ds::dropDatabase("MySQL", mysql_params);
+  ds::initDatabase(id, user1, "MySQL", mysql_params);
+#endif
+
+#ifndef SAMPLE_MYSQL
+  ds::initDatabase(id, user1);
+#endif
+
+  if (errorstring)
+  {
+    printf("\nError initializing UXP data services database\n");
+    return;
+  }
+
+  db = ds::openDatabase(0);
+
+  /* Open new database. Authentication will happen at command line */
+
+  printf("Opening session and authenticating\n");
+
+  printf("\nCredentials necessary to open session:\n");
+  printf("  Username = %1\n", user1);
+  printf("  Challenge 1 = Response 1\n");
+  printf("  Challenge 2 = Response 2\n");
+  printf("  ... \n");
+  printf("  Challenge 10 = Response 10\n\n");
+
+  session = ds::openSession(user1, 1);
+  isAuthorized = authenticate_dsdb_session(session);
+  if (isAuthorized == 2)
+  {
+    printf("\nSuccessfully authenticated into Database\n");
+  }
+  else
+  {
+    printf("\nError: Could not authenticate into Database\n");
+  }
+
+  ds::setServer(session, "file:///localhost");
+  ds::setAccessCode(session, "01234567890123456789012345678901");
+
+  /* Store the source of the ID */
+
+  idbuf = file::readAll("$(SAMPLE)/SampleData/sampleid.xml");
+
+  ds::getUserId(session, user1,
+                "AdminID", table);
+
+  table::set(table, "source", idbuf);
+
+  ds::updateUserId(session,
+                   user1,
+                   "AdminID",
+                   table);
+
+  /* Print out User info */
+
+  ds::getUser(session, user1, table);
+
+  printf("\nUser: %1\n", user1);
+  printf("-----------------------------\n");
+
+  printf("Formal Name: %1\n", table::get(table, "formalname"));
+  printf("Description: %1\n", table::get(table, "description"));
+  printf("Email: %1\n", table::get(table, "email"));
+  printf("Privileges: %1\n", table::get(table, "privileges"));
+
+  ds::getUserId(session,
+                user1,
+                "AdminID",
+                table);
+
+  printf("\nUser: %1  ID: SessionID\n", user1);
+  printf("--------------------------------------------\n");
+
+  printf("Description: %1\n", table::get(table, "description"));
+  printf("Flags: %1\n", table::get(table, "flags"));
+  printf("Uxpid: *****\n");
+  printf("Source: *****\n");
+
+  /* Create 2nd User from sample ID */
+
+  idbuf = file::readAll("$(SAMPLE)/SampleData/sampleid2.xml");
+
+  id2 = id::newIdFromDocument(idbuf);
+
+  table::clear(table);
+  table::set(table, "formalname", "Joe Sample");
+  table::set(table, "description", "This is a test user");
+  table::set(table, "email", user2);
+  table::set(table, "privileges", 0);
+  table::set(table, "app_data1", "Sample App Data");
+  table::set(table, "app_data2", "More App Data");
+
+  ds::newUser(session, user2, table);
+
+  table::clear(table);
+  table::set(table, "flags", 6);
+  table::set(table, "description", "MyID");
+  table::set(table, "uxpid", id2);
+  table::set(table, "source", "");
+
+  ds::newUserId(session, user2, "MyID", table);
+
+  ds::getUsers(session, filter, &outlist);
+
+  printf("\nUsers\n");
+  printf("-----\n");
+
+  for (i = 0; i < countList(outlist); i++)
+  {
+    printf("%1\n", getList(outlist, i));
+  }
+
+  ds::getUser(session, user2, table);
+
+  printf("\nUser: %1\n", user2);
+  printf("-----------------------------\n");
+
+  printf("Formal Name: %1\n", table::get(table, "formalname"));
+  printf("Description: %1\n", table::get(table, "description"));
+  printf("Email: %1\n", table::get(table, "email"));
+  printf("Privileges: %1\n", table::get(table, "privileges"));
+  printf("AppData1: %1\n", table::get(table, "app_data1"));
+  printf("AppData2: %1\n", table::get(table, "app_data2"));
+
+  /* Create a Delegate Identity and select info */
+
+  table::clear(table);
+  table::set(table, "description", "Company access");
+  table::set(table, "expiration", 0);
+  table::set(table, "permit_offline", 0);
+  table::set(table, "offline_duration", 0);
+  table::set(table, "access_max", 0);
+  table::set(table, "flags", 1);
+
+  dl::newDelegate(session,
+                  user1,
+                  delegate1,
+                  table);
+
+  dl::getDelegate(session,
+                  user1,
+                  delegate1,
+                  table);
+
+  file::writeAll("$(SAMPLE)/temp/delegate.iic", table::get(table, "uxpid"), "replace");
+
+  printf("\nDelegate: %1\n", delegate1);
+  printf("-------------------------\n");
+
+  printf("Description: %1\n", table::get(table, "description"));
+
+  printf("Expiration: %1\n", table::get(table, "description"));
+  printf("Permit Offline: %1\n", table::get(table, "description"));
+  printf("Offline Duration: %1\n", table::get(table, "offline_duration"));
+  printf("Access Max: %1\n", table::get(table, "access_max"));
+  printf("Checksum: %1\n", table::get(table, "checksum"));
+  printf("Uxpid: ****\n");
+
+  /*
+      Add the Uuser to the sample ID.  UXP Objects
+      created with the Delegate ID will contain the new User,
+      Delegate Subscriber.
+  */
+
+  idbuf = file::readAll("$(SAMPLE)/SampleData/sampleid.xml");
+  b1 = id::getUsers(table::get(table, "uxpid"));
+  idbuf = id::addUsers(idbuf, b1);
+
+  id = id::newIdFromDocument(idbuf);
+
+  file::writeAll("$(SAMPLE)/temp/sampleid.iic", id, "replace");
+
+  /* Manage Subscriptions */
+
+  table::clear(table);
+  table::set(table, "expiration", 0);
+  table::set(table, "permit_offline", 1);
+  table::set(table, "offline_duration", 1);
+  table::set(table, "access_max", 10);
+  table::set(table, "flags", 1);
+
+  dl::subscribe(session,
+                user1,
+                delegate1,
+                user2,
+                table);
+
+  dl::getSubscribers(session,
+                     user1,
+                     delegate1,
+                     filter,
+                     &outlist);
+
+  printf("\nSubscribers\n");
+  printf("-----------\n");
+
+  for (i = 0; i < countList(outlist); i++)
+  {
+    dl::getSubscription(session, user1,
+                        delegate1,
+                        getList(outlist, i),
+                        table);
+
+    printf("Delegate: %1\n", delegate1);
+    printf("Subscriber: %1\n", getList(outlist, i));
+    printf("Expiration: %1\n", table::get(table, "expiration"));
+    printf("Permit Offline: %1\n", table::get(table, "permit_offline"));
+    printf("Offline Duration: %1\n", table::get(table, "offline_duration"));
+    printf("Access Max: %1\n", table::get(table, "access_max"));
+    printf("Access Count: %1\n", table::get(table, "access_count"));
+  }
+
+  dl::getSubscriptions(session, user2, &outlist);
+
+  printf("\nSubscriptions\n");
+  printf("-------------\n");
+
+  for (i = 0; i < countList(outlist); i++)
+  {
+    pair = getList(outlist, i);
+    printf("%1: %2\n", pair.name, pair.value);
+  }
+
+  /* Create a new UXP Object with the Delegate ID */
+
+  printf("\nCreating new UXP containing Delegate ID: sample_table::get(table, "uxp\n");
+  printf("Protecting document data.pdf\n");
+
+  /*
+   * We are using the actual Delegate ID to protect data.  Though easy to do, this is
+   * not recommented as you have little policy control.  Instead, create a new UXP Identity
+   * by adding any personal user as well as the User from the Delegate ID.
+   * Then, set the policies for the UXP Identity and publish it to an IIC.
+   */
+
+  data = sf::newUxp("$(SAMPLE)/temp/sample_table::get(table, "uxp",
+                    "$(SAMPLE)/temp/sampleid.iic", "IdFile|Replace");
+  sf::addFile(data, "data.pdf", "$(SAMPLE)/SampleData/data.pdf");
+  sf::closeUxp(data);
+
+  printf("Closing new UXP\n");
+  printf("Opening new UXP\n");
+
+  printf("\nCredentials necessary to open UXP:\n");
+  printf("  Username = SampleUser2@myemail.com\n");
+  printf("  Challenge 1 = MyResponse 1\n");
+  printf("  Challenge 2 = MyResponse 2\n");
+  printf("  ... \n");
+  printf("  Challenge 10 = MyResponse 10\n");
+
+  data = sf::openUxp("$(SAMPLE)/temp/sample_delegate.uxp", "ShareAll");
+  if (data == 0)
+  {
+    printf("\nNot authorized: %1\n", errorstring);
+    return;
+  }
+
+  status = authenticate_uxp(data);
+  if (status != 16)
+  {
+    printf("\nNot authorized\n");
+    return;
+  }
+  
+  /* Read the virtual file and write it back out to disk */
+
+  printf("\nYou're authorized via Delegate Services\n");
+  printf("\nExtracting data.pdf to copy2.pdf\n");
+
+  sf::exportFile(data, "data.pdf", "$(SAMPLE)/temp/copy.pdf", "Replace");
+  if (errorstring)
+  {
+    printf("Error exporting virtual file: %1\n", errorstring);
+  }
+
+  dl::getSubscribers(session,
+                     user1,
+                     delegate1, filter, &outlist);
+
+  printf("\nSubscribers After Remote Authentication\n");
+  printf("---------------------------------------\n");
+
+  for (i = 0; i < countList(outlist); i++)
+  {
+    dl::getSubscription(session, user1,
+                        delegate1,
+                        getList(outlist, i),
+                        table);
+
+    printf("Delegate: %1\n", delegate1);
+    printf("Subscriber: %1\n", getList(outlist, i));
+    printf("Expiration: %1\n", table::get(table, "expiration"));
+    printf("Permit Offline: %1\n", table::get(table, "permit_offline"));
+    printf("Offline Duration: %1\n", table::get(table, "offline_duration"));
+    printf("Access Max: %1\n", table::get(table, "access_max"));
+    printf("Access Count: %1\n", table::get(table, "access_count"));
+  }
+
+  table::delete(table);
+
+  printf("\nSample finished running\n");
+
+  return 0;
+}
+
+replace procedure authenticate_uxp(data)
+{
+  int i, cnt, status;
+  list challenges;
+  string buf, prompt, response, outbuf;
+
+  for (;;)
+  {
+    status = sf::authenticate(data);
+    if (status != 512)
+      break;
+      
+    buf = sf::getChallenges(data);
+    challenges = split(buf, "|");
+    cnt = countList(challenges);
+
+    for (i = 0; i < cnt; i++)
+    {
+      prompt = getList(challenges,i);
+
+      if (strlen(outbuf) > 0)
+      {
+        outbuf = concat(outbuf, "||");
+      }
+
+      if (toUpper(prompt) == "USERNAME")
+      {
+        response = "SampleUser@myemail.com";
+      }
+      else
+      {
+        response = concat("Response ", substr(prompt,10, -1));
+      }
+
+      outbuf = concat(outbuf,prompt,"|",response);
+    }
+
+    sf::setResponses(data, outbuf);
+  }
+   
+  return status;
+}
+
+replace procedure authenticate_dsdb_session(session)
+{
+  int done = false;
+  int x, i, cnt, status;
+  list list2, challenges;
+  string buf, name, prompt, response, outbuf;
+
+  while (!done)
+  {
+    status = ds::authenticate(session);
+    switch (status)
+    {
+      case 16:
+        printf("You are authorized\n");
+        done = true;
+        break;
+
+      case 1:
+        printf("You are not authorized\n");
+        ds::closeSession(session);
+        ds::closeDatabase();
+        return 1;
+
+      case 512:
+        buf = ds::getChallenges(session);
+        challenges = split(buf, "|");
+        cnt = countList(challenges);
+
+        for (i = 0; i<cnt; i++)
+        {
+          prompt = getList(challenges, i);
+
+          if (strlen(outbuf) > 0)
+          {
+            outbuf = concat(outbuf, "||");
+          }
+
+          if (name == "USERNAME")
+          {
+            response = "Admin";
+          }
+          else
+          {
+            response = concat("Response ", substr(prompt,10, -1));
+          }
+
+          outbuf = concat(outbuf,prompt,"|",response);
+        }
+
+        ds::setResponses(lib, session, outbuf);
+        break;
+    }
+  }
+}
+
+
+sample_workflow_delegate();

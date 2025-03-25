@@ -1,0 +1,53 @@
+/*!
+    \copyright Sertainty Corporation, 2021.  All Rights Reserved.
+
+    \file     id_from_xml.uxl
+
+    \brief    This sample demonstrates how to construct a UXP Identity file (*.iic) from an ID Definition XML Source file (*.xml).
+              The generated UXP Identity file (*.iic) can be used to generate a UXP Object.
+
+    \author   Melvin Valdez de la Roca
+    \date     06/22/2020
+
+    \note     Application expects to find the necessary source files in the current working folder.
+ */
+
+replace procedure id_from_xml()
+{
+  bytearray b1, b2;
+  string idXmlSpec = "$(SAMPLE)/SampleData/sampleid.xml";   // Source ID Definition XML
+  string idFileSpec = "$(SAMPLE)/temp/sampleid.iic";  // Sertainty ID file name to be created
+
+  printf("\nCreating a Sertainty ID from an ID Definition XML\n\n");
+
+  /* Create a new ID from the sampleid.xml ID Definition XML Source */
+
+  b1 = file::readAll(idXmlSpec);
+  if (errorstring)
+  {
+    printf("Error Reading ID XML: %1\n", errorstring);
+    return;
+  }
+
+  /* Create ID from XML document */
+
+  b2 = id::newIdFromDocument(b1);
+
+  /* Save ID to file */
+  
+  file::writeAll(idFileSpec, b2, "replace");
+  if (errorstring)
+  {
+    printf("Error Creating Sertainty ID: %1\n", errorstring);
+    return;
+  }
+
+  printf("Your ID is now created. Try protecting a file with it.\n");
+
+  printf("\nSample finished running\n");
+
+  return 0;
+}
+
+id_from_xml();
+  

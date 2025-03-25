@@ -1,0 +1,609 @@
+/*!
+ \copyright Sertainty Corporation, 2021. All Rights Reserved.
+ 
+ \file     4-delegate_add_users.uxl
+ 
+ \brief    This sample code opens the newly created database and adds the Users and User IDs.
+ 
+ \author   Melvin Valdez de la Roca
+ \date     03/08/2021
+ 
+ \note     Application expects to find the necessary source files in the current working folder.
+ */
+
+/*
+ ds::deleteUser
+ ds::getUser
+ ds::getUserId
+ ds::getUsers
+ ds::getUserIds
+ ds::newUser
+ ds::newUserId
+ ds::updateUser
+ ds::updateUserId
+ */
+
+replace procedure createId(idXmlSpec,idSpec)
+{
+  printf("Creating %1\n",idSpec);
+  bytearray idBuf = file::readAll(idXmlSpec);
+  bytearray id = id::newIdFromDocument(idBuf);
+  file::writeAll(idSpec,id,"replace");
+}
+
+replace procedure users()
+{
+  string user_main = "SampleUser@myemail.com";
+  string user1 = "SampleUser1@myemail.com";
+  string user2 = "SampleUser2@myemail.com";
+  string user3 = "SampleUser3@myemail.com";
+  string xml1 = "$(SAMPLE)/SampleData/sampleid1.xml";
+  string xml2 = "$(SAMPLE)/SampleData/sampleid2.xml";
+  string xml3 = "$(SAMPLE)/SampleData/sampleid3.xml";
+  string userid1 = "ID1";
+  string userid2 = "ID2";
+  string userid3 = "ID3";
+  string id1 = "$(SAMPLE)/temp/sampleid1.iic";
+  string id2 = "$(SAMPLE)/temp/sampleid2.iic";
+  string id3 = "$(SAMPLE)/temp/sampleid3.iic";
+  string delegate1 = "Delegate_1";
+  int session;
+  int a, b, c, i, j, userExists, userIdExists;
+  list userlist, filter, useridlist;
+  bytearray buffer1, buffer2, buffer3;
+  table table;
+  
+  on return
+  {
+    ds::closeSession(session);
+    ds::closeDatabase();
+  }
+  
+  table = table::create();
+  
+  /* Open Database */
+  
+  ds::openDatabase(0);
+  if (errorstring)
+  {
+    printf("Error opening data services database: %1\n", errorstring);
+    return;
+  }
+  else
+  {
+    printf("\nOpened Database");
+  }
+  
+  /* Open Session */
+  
+  session = ds::openSession(user_main);
+  if (errorstring)
+  {
+    printf("Error opening session for data services database: %1\n", errorstring);
+    return;
+  }
+  else
+  {
+    printf("\nOpened Session\n");
+  }
+  
+  authenticate_dsdb_auto(session, user_main);
+  
+  printf("\n- - - GET USERS (BEFORE CHANGES)- - -\n");
+  ds::getUsers(session, filter, &userlist);
+  
+  printf("\nThere are [%1] Users in the database\n", countList(userlist));
+  
+  for (i = 0; i < countList(userlist); i++)
+  {
+    userExists = ds::getUser(session, getList(userlist,i), table);
+    if (userExists == 1)
+    {
+      printf("\n\tUser: [%1]\n", getList(userlist,i));
+      printf("\n\tformalname = %1\n", table::get(table, "formalname"));
+      printf("\n\tdescription = %1\n", table::get(table, "description"));
+      printf("\n\temail = %1\n", table::get(table, "email"));
+      printf("\n\tprivileges = %1\n", table::get(table, "privileges"));
+      printf("\n\tapp_data1 = %1\n", table::get(table, "app_data1"));
+      printf("\n\tapp_data2 = %1\n\n", table::get(table, "app_data2"));
+    }
+    else
+    {
+      printf("\nUser '%1' does not exist!\n", getList(userlist,i));
+    }
+  }
+  printf("- - - - - - - - - - - - - - - - - - -\n");
+  
+  printf("\nADDING NEW USERS\n");
+  
+  /* Add First User */
+  
+  table::clear(table);
+  table::set(table, "formalname", "User number 1");
+  table::set(table, "description", "Joe User 1");
+  table::set(table, "email", user1);
+  table::set(table, "privileges", 1);
+  table::set(table, "app_data1", "Sample App Data");
+  table::set(table, "app_data2", "More App Data");
+
+  a = ds::newUser(session, user1, table);
+  if (a == 1)
+  {
+    printf("- User [%1] added successfully\n", user1);
+  }
+  else
+  {
+    printf("- Error creating new User [%1]\n", user1);
+    return;
+  }
+  
+  /* Add Second User */
+  
+  table::clear(table);
+  table::set(table, "formalname", "User number 2");
+  table::set(table, "description", "Joe User 2");
+  table::set(table, "email", user2);
+  table::set(table, "privileges", 1);
+  table::set(table, "app_data1", "Sample App Data");
+  table::set(table, "app_data2", "More App Data");
+
+  a = ds::newUser(session, user2, table);
+  if (a == 1)
+  {
+    printf("- User [%1] added successfully\n", user2);
+  }
+  else
+  {
+    printf("- Error creating new User [%1]\n", user2);
+    return;
+  }
+  
+  /* Add Third User */
+  
+  table::clear(table);
+  table::set(table, "formalname", "User number 3");
+  table::set(table, "description", "Joe User 3");
+  table::set(table, "email", user3);
+  table::set(table, "privileges", 1);
+  table::set(table, "app_data1", "Sample App Data");
+  table::set(table, "app_data2", "More App Data");
+
+  a = ds::newUser(session, user3, table);
+  if (a == 1)
+  {
+    printf("- User [%1] added successfully\n", user3);
+  }
+  else
+  {
+    printf("- Error creating new User [%1]\n", user3);
+    return;
+  }
+  
+  /* Negative Test - Attempt to add the same User again */
+  
+  printf("\nATTEMPTING TO ADD SAME USER ...\n");
+  
+  table::clear(table);
+  table::set(table, "formalname", "User number 1");
+  table::set(table, "description", "Joe User 1");
+  table::set(table, "email", user1);
+  table::set(table, "privileges", 1);
+  table::set(table, "app_data1", "Sample App Data");
+  table::set(table, "app_data2", "More App Data");
+
+  a = ds::newUser(session, user1, table);
+  if (a == 1)
+  {
+    printf("- User [%1] added successfully\n", user1);
+  }
+  else
+  {
+    printf("- Error adding same User [%1]\n", user1);
+  }
+  
+  clearList(userlist);
+  
+  printf("\n- - - GET USERS (AFTER CHANGES) - - -\n");
+  ds::getUsers(session, filter, &userlist);
+  
+  printf("\nThere are [%1] Users in the database\n", countList(userlist));
+  
+  for (i = 0; i < countList(userlist); i++)
+  {
+    userExists = ds::getUser(session, getList(userlist,i), table);
+    if (userExists == 1)
+    {
+      printf("\n\tUser: [%1]\n", getList(userlist,i));
+      printf("\n\tformalname = %1\n", table::get(table, "formalname"));
+      printf("\n\tdescription = %1\n", table::get(table, "description"));
+      printf("\n\temail = %1\n", table::get(table, "email"));
+      printf("\n\tprivileges = %1\n", table::get(table, "privileges"));
+      printf("\n\tapp_data1 = %1\n", table::get(table, "app_data1"));
+      printf("\n\tapp_data2 = %1\n\n", table::get(table, "app_data2"));
+    }
+    else
+    {
+      printf("\nUser '%1' does not exist!\n", getList(userlist,i));
+    }
+  }
+  printf("- - - - - - - - - - - - - - - - - - -\n");
+  
+  printf("\nUPDATING NEW USER\n");
+  
+  table::clear(table);
+  table::set(table, "formalname", "UPDATED FORMAL NAME");
+  table::set(table, "description", "UPDATED DESCRIPTION");
+  table::set(table, "email", "UPDATED EMAIL");
+  table::set(table, "privileges", 1);
+  table::set(table, "app_data1", "UPDATED SAMPLE APP DATA");
+  table::set(table, "app_data2", "UPDATED MORE APP DATA");
+
+  a = ds::updateUser(session, user1, table);
+  if (a == 1)
+  {
+    printf("- Updated User\n");
+  }
+  else
+  {
+    printf("- Error UPDATING User\n");
+    return;
+  }
+  
+  printf("\n- - - GET USERS (AFTER UPDATE) - - -\n");
+  ds::getUsers(session, filter, &userlist);
+  
+  printf("\nThere are [%1] Users in the database\n", countList(userlist));
+  
+  for (i = 0; i < countList(userlist); i++)
+  {
+    userExists = ds::getUser(session, getList(userlist,i), table);
+    if (userExists == 1)
+    {
+      printf("\n\tUser: [%1]\n", getList(userlist,i));
+      printf("\n\tformalname = %1\n", table::get(table, "formalname"));
+      printf("\n\tdescription = %1\n", table::get(table, "description"));
+      printf("\n\temail = %1\n", table::get(table, "email"));
+      printf("\n\tprivileges = %1\n", table::get(table, "privileges"));
+      printf("\n\tapp_data1 = %1\n", table::get(table, "app_data1"));
+      printf("\n\tapp_data2 = %1\n\n", table::get(table, "app_data2"));
+    }
+    else
+    {
+      printf("\nUser '%1' does not exist!\n", getList(userlist,i));
+    }
+  }
+  
+  printf("- - - - - - - - - - - - - - - - - - -\n");
+  
+  printf("\n- - - GET USER IDs (BEFORE CHANGES) - - -\n");
+  
+  for (i = 0; i < countList(userlist); i++)
+  {
+    ds::getUserIds(session, getList(userlist,i), 1, &useridlist);
+    
+    printf("\nUser [%1] has [%2] User IDs in the database\n", getList(userlist,i), countList(useridlist));
+    
+    for (j = 0; j < countList(useridlist); j++)
+    {
+      userIdExists = ds::getUserId(session, getList(userlist,i),
+                                   getList(useridlist,j),
+                                   table);
+      if (userIdExists == 1)
+      {
+        printf("\n\tUserID: [%1]\n", getList(useridlist,j));
+        printf("\n\tflags = %1\n", table::get(table, "flags"));
+        printf("\n\tdescription = %1\n\n", table::get(table, "description"));
+      }
+      else
+      {
+        printf("\nUserId '%1' does not exist!\n", getList(useridlist,j));
+      }
+    }
+  }
+  
+  printf("- - - - - - - - - - - - - - - - - - - - -\n");
+  
+  printf("\nADDING NEW USER IDS\n");
+  
+  /* Add First User ID */
+  
+  createId(xml1, id1);
+  buffer1 = file::readAll(id1);
+  if(errorstring)
+  {
+    printf("Error reading sampleid1.xml: %1\n", errorstring);
+    return;
+  }
+  
+  table::clear(table);
+  table::set(table, "flags", 1);
+  table::set(table, "description", "My first ID");
+  table::set(table, "uxpid", buffer1);
+  table::set(table, "source", "");
+
+  b = ds::newUserId(session, user1, userid1, table);
+  if (b == 1)
+  {
+    printf("- User ID [%1] added successfully\n", userid1);
+  }
+  else
+  {
+    printf("- Error adding User ID [%1]\n", userid1);
+    return;
+  }
+  
+  /* Add Second User ID */
+  
+  createId(xml2, id2);
+  buffer2 = file::readAll(id2);
+  if(errorstring)
+  {
+    printf("Error reading sampleid2.xml: %1\n", errorstring);
+    return;
+  }
+  
+  table::clear(table);
+  table::set(table, "flags", 1);
+  table::set(table, "description", "My second ID");
+  table::set(table, "uxpid", buffer2);
+  table::set(table, "source", "");
+
+  b = ds::newUserId(session, user2, userid2, table);
+  if (b == 1)
+  {
+    printf("- User ID [%1] added successfully\n", userid2);
+  }
+  else
+  {
+    printf("- Error adding User ID [%1]\n", userid2);
+    return;
+  }
+  
+  /* Add Third User ID */
+  
+  createId(xml3, id3);
+  buffer3 = file::readAll(id3);
+  if(errorstring)
+  {
+    printf("Error reading sampleid3.xml: %1\n", errorstring);
+    return;
+  }
+  
+  table::clear(table);
+  table::set(table, "flags", 1);
+  table::set(table, "description", "My second ID");
+  table::set(table, "uxpid", buffer3);
+  table::set(table, "source", "");
+
+  b = ds::newUserId(session, user3, userid3, table);
+  if (b == 1)
+  {
+    printf("- User ID [%1] added successfully\n", userid3);
+  }
+  else
+  {
+    printf("- Error adding User ID [%1]\n", userid3);
+    return;
+  }
+  
+  /* Negative Test - Attempt to add the same User ID again */
+  
+  printf("\nATTEMPTING TO ADD SAME USER ID ...\n");
+  
+  table::clear(table);
+  table::set(table, "idname", userid1);
+  table::set(table, "flags", 1);
+  table::set(table, "description", "My first ID");
+  table::set(table, "uxpid", buffer1);
+  table::set(table, "source", "");
+
+  b = ds::newUserId(session, user1, userid1, table);
+  if (b == 1)
+  {
+    printf("- Same User ID [%1] added successfully\n", userid1);
+  }
+  else
+  {
+    printf("- Error adding same User ID [%1]\n", userid1);
+  }
+  
+  clearList(useridlist);
+  
+  printf("\n- - - GET USER ID (AFTER CHANGES) - - -\n");
+  for (i = 0; i < countList(userlist); i++)
+  {
+    ds::getUserIds(session, getList(userlist,i), 1, &useridlist);
+    
+    printf("\nUser [%1] has [%2] User IDs in the database\n", getList(userlist,i), countList(useridlist));
+    
+    for (j = 0; j < countList(useridlist); j++)
+    {
+      userIdExists = ds::getUserId(session, getList(userlist,i),
+                                   getList(useridlist,j), table);
+      if (userIdExists == 1)
+      {
+        printf("\n\tUserID: [%1]\n", getList(useridlist,j));
+        printf("\n\tflags = %1\n", table::get(table, "flags"));
+        printf("\n\tdescription = %1\n\n", table::get(table, "description"));
+      }
+      else
+      {
+        printf("\nUserId '%1' does not exist!\n", getList(useridlist,j));
+      }
+    }
+  }
+  printf("- - - - - - - - - - - - - - - - - - - -\n");
+  
+  printf("\nUPDATING NEW USER ID\n");
+  
+  table::clear(table);
+  table::set(table, "flags", 1);
+  table::set(table, "description", "UPDATED DESCRIPTION");
+  table::set(table, "uxpid", buffer1);
+  table::set(table, "source", "");
+
+  b = ds::updateUserId(session, user1, userid1, table);
+  if (b == 1)
+  {
+    printf("- Updated User ID\n");
+  }
+  else
+  {
+    printf("- Error UPDATING user ID\n");
+  }
+  
+  printf("\n- - - GET USER ID (AFTER UPDATE) - - -\n");
+  
+  for (i = 0; i < countList(userlist); i++)
+  {
+    ds::getUserIds(session, getList(userlist,i), 1, &useridlist);
+    
+    printf("\nUser [%1] has [%2] User IDs in the database\n", getList(userlist,i), countList(useridlist));
+        
+    for (j = 0; j < countList(useridlist); j++)
+    {
+      userIdExists = ds::getUserId(session, getList(userlist,i),
+                                   getList(useridlist,j),
+                                   table);
+      if (userIdExists == 1)
+      {
+        printf("\n\tUserID: [%1]\n", getList(useridlist,j));
+        printf("\n\tflags = %1\n", table::get(table, "flags"));
+        printf("\n\tdescription = %1\n\n", table::get(table, "description"));
+      }
+      else
+      {
+        printf("\nUserId '%1' does not exist!\n", getList(useridlist,j));
+      }
+    }
+  }
+  printf("- - - - - - - - - - - - - - - - - - - -\n");
+  
+  printf("\nDELETING NEW USER\n");
+  
+  c = ds::deleteUser(session, user3);
+  if (c == 1)
+  {
+    printf("- User [%1] deleted\n", user3);
+    
+    printf("\n- - - GET USERS (AFTER DELETION) - - -\n");
+    ds::getUsers(session, filter, &userlist);
+    printf("\nThere are [%1] Users in the database\n", countList(userlist));
+    for (i = 0; i < countList(userlist); i++)
+    {
+      userExists = ds::getUser(session, getList(userlist,i), table);
+      if (userExists == 1)
+      {
+        printf("\n\tUser: [%1]\n", getList(userlist,i));
+        printf("\n\tformalname = %1\n", table::get(table, "formalname"));
+        printf("\n\tdescription = %1\n", table::get(table, "description"));
+        printf("\n\temail = %1\n\n", table::get(table, "email"));
+      }
+      else
+      {
+        printf("\nUser '%1' does not exist!\n", getList(userlist,i));
+      }
+    }
+  }
+  else
+  {
+    printf("\n- Error: User could not be deleted\n");
+  }
+
+  table::delete(table);
+  
+  printf("Sample finished running\n");
+
+  return 0;
+}
+
+replace procedure authenticate_dsdb_auto(session, user)
+{
+  int i, j, status;
+  int cntLine, cntChallenges, cntAuthChallenge, locateSeparator, locateCred;
+  list list2, challenges, auth_challenge, userinfo, challenges_info;
+  string buf, name, outbuf, username, credentials, challenges_name, challenges_pro, challenges_res, challenges_buf;
+  string credFile = "$(SAMPLE)/SampleData/credentials.txt";
+  bytearray specFile;
+  
+  specFile = file::readAll(credFile);
+  
+  /* Get User Info from credentials.txt */
+  
+  userinfo = split(specFile, "\n\n");
+  cntLine = countList(userinfo);
+  
+  /* Extract User info from credentials file and place in list */
+  
+  for (i = 0; i < cntLine; i++)
+  {
+    locateSeparator = locate(getList(userinfo,i), "=");
+    username = substr(getList(userinfo,i), 0, locateSeparator);
+    if (username == user)
+    {
+      locateCred = (locateSeparator + 1);
+      credentials = substr(getList(userinfo,i), locateCred, 500);
+      challenges = split(credentials, "||");
+      cntChallenges = countList(challenges);
+    }
+  }
+  
+  /* Start authentication */
+  
+  for (;;)
+  {
+    status = ds::authenticate(session);
+    
+    switch (status)
+    {
+      case 16:
+        printf("You are authorized\n");
+        return 1;
+        
+      case 1:
+        printf("You are not authorized\n");
+        ds::closeSession(session);
+        ds::closeDatabase();
+        return 0;
+        
+      case 512:
+        buf = ds::getChallenges(session);
+        auth_challenge = split(buf, "|");
+        cntAuthChallenge = countList(auth_challenge);
+        
+        for (i = 0; i < cntAuthChallenge; i++)
+        {
+          name = getList(auth_challenge, i);
+          
+          for (j = 0; j < cntChallenges; j++)
+          {
+            challenges_buf = getList(challenges,j);
+            challenges_info = split(challenges_buf, "|");
+            challenges_name = getList(challenges_info,0);
+            challenges_pro = getList(challenges_info, 1);
+            challenges_res = getList(challenges_info, 2);
+            
+            if (challenges_pro == name)
+            {
+              if(strlen(outbuf) > 0)
+              {
+                outbuf = concat(outbuf, "||");
+              }
+              
+              outbuf = concat(outbuf, challenges_pro, "|", challenges_res);
+            }
+            
+            clearList(challenges_info);
+          }
+        }
+        
+        ds::setResponses(session, outbuf);
+        break;
+        
+      default:
+        return 0;
+    }
+  }
+}
+
+users();

@@ -1,0 +1,63 @@
+/*!
+    \copyright Sertainty Corporation, 2021. All Rights Reserved.
+
+    \file     uxp_from_id_v2.uxl
+
+    \brief    This program shows how you can create a UXP file using a Sertainty Version 2 ID.
+              - Adds data files into the created UXP Object.
+
+    \author   Melvin Valdez de la Roca
+    
+    \edited   Melani Smith Weed
+    \date     03/12/2021
+
+
+    \note     Application expects to find the necessary source files in the current working folder.
+ */
+
+replace procedure uxp_from_id_v2()
+{
+  int sf;
+  string idFileSpec = "$(SAMPLE)/temp/sampleid-v2.iic";  // Sertainty V2 ID file name
+  string uxpFileSpec = "$(SAMPLE)/temp/sample-v2.uxp";  // UXP name to be given
+  string dataPdfSpec = "$(SAMPLE)/SampleData/data.pdf";  // Source Data1
+  string dataPdf2Spec = "$(SAMPLE)/SampleData/data2.pdf";  // Source Data2
+
+  printf("\nCreating a UXP file using a Sertainty V2 ID\n\n");
+
+  /* Create new UXP Object from UXP Identity */
+
+  sf = sf::newUxp(uxpFileSpec, idFileSpec, "IDFile|Replace");
+  if (errorstring)
+  {
+    printf("Error Creating new UXP: %1\n", errorstring);
+    return;
+  }
+
+  /* Create a new virtual file inside the Data */
+
+  sf::addFile(sf, "data.pdf", dataPdfSpec, -1, -1, "Compress");
+  if (errorstring)
+  {
+    printf("Error Adding Data to UXP: %1\n", errorstring);
+    return;
+  }
+
+  sf::addFile(sf, "data2.pdf", dataPdf2Spec, -1, -1, 0);
+  if (errorstring)
+  {
+    printf("Error Adding Data to UXP: %1\n", errorstring);
+    return;
+  }
+
+  sf::closeUxp(sf);
+
+  printf("You have successfully created a protected UXP and added files into it.\n");
+  printf("You can now try to open the UXP to read the contents.\n");
+
+  printf("\nSample finished running\n");
+
+  return 0;
+}
+
+uxp_from_id_v2();

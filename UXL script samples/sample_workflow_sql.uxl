@@ -1,0 +1,234 @@
+/*! 
+    \copyright Sertainty Corporation, 2020.  All Rights Reserved.
+
+    \file     sample_workflow_sql.uxl
+
+    \brief  Sertainty sample program using SQL and uxl language interface.  Uses XML to create ID.
+    
+    \details  Demonstrates using UXP as a SQL database – using UXL scripting language interface
+                   (1) Creates ID from xml
+                   (2) Creates UXP from ID
+                   (3) Creates SQL tables within the UXP object
+                   (4) Close / Re-opens UXP
+                   (5) Accesses SQL / data
+
+    \author   Greg Smith
+    \date     12/13/2019
+
+    \edited   Melani Smith Weed
+    \date     27-jul-2020
+
+    \note     Application expects to find the necessary source files in the current working folder.
+ */
+
+replace procedure authenticate_uxp(data)
+{
+  int i, cnt, status;
+  list challenges;
+  string buf, name, prompt, response, outbuf;
+
+  for (;;)
+  {
+    status = sf::authenticate(data);
+    if (status != 512)
+      break;
+      
+    buf = sf::getChallenges(data);
+    challenges = split(buf, "|");
+    cnt = countList(challenges);
+
+    for (i = 0; i < cnt; i++)
+    {
+      prompt = getList(challenges,i);
+
+      if (strlen(outbuf) > 0)
+      {
+        outbuf = concat(outbuf, "||");
+      }
+
+      if (toUpper(prompt) == "USERNAME")
+      {
+        response = "SampleUser@myemail.com";
+      }
+      else
+      {
+        response = concat("Response ", substr(prompt,10, -1));
+      }
+
+      outbuf = concat(outbuf,prompt,"|",response);
+    }
+
+    sf::setResponses(data, outbuf);
+  }
+   
+  return status;
+}
+
+replace procedure checkError()
+{
+  if (errorstring)
+  {
+    printf("Error: %1\n", errorstring);
+    return true;
+  }
+  
+  return false;
+}
+
+/**
+ * @brief Main entry point
+ * @return 0 - success, 1 - error
+ */
+replace procedure main()
+{
+  string sqlFileSpec = "$(SAMPLE)/SampleData/sample_sql.sql";
+  string idXmlSpec = "$(SAMPLE)/SampleData/sampleid.xml";
+  string outfile = "$(SAMPLE)/temp/sample_sql.uxp";
+  string idFileSpec = "$(SAMPLE)/temp/sampleid.iic";
+  bytearray idbuf, outbuf;
+  int status, done, data;
+
+  printf("\nSample SQL UXL script using ID\n\n");
+
+  /* Create a new ID from the sampleid.xml ID definition */
+
+  idbuf = file::readAll(idXmlSpec);
+  
+  outbuf = id::newIdFromDocument(idbuf);
+  
+  file::writeAll(idFileSpec, outbuf, "replace");
+
+  /* Create new UXP from ID */
+
+  printf("Opening new UXP: %1\n", outfile);
+
+  data = sf::newUxp(outfile, idFileSpec, "IdFile|ReadWrite|Replace");
+  if (checkError())
+    return 1;
+
+  /* Create a SQL connection in order to use the UXP as a SQL database */
+
+  int query = sql::newQuery(data);
+  if (checkError())
+    return 1;
+
+  printf("\nCreating SQL tables\n");
+
+  sql::exec(query, "create table t1 (c1 string, c2 number)");
+  sql::exec(query, "create index i1 on t1 (c1)");
+
+  if (true)
+  {
+    sql::execScript(query, file::readAll(sqlFileSpec));
+  }
+  else
+  {
+    printf("Adding data (Inline)\n");
+
+    sql::exec(query, "insert into t1 (c1,c2) values ('Greg',7)");
+    sql::exec(query, "insert into t1 (c1,c2) values ('Rose',38)");
+    sql::exec(query, "insert into t1 (c1,c2) values ('George',12)");
+  }
+  
+  printf("Testing rollback\n");
+
+  sql::exec(query, "begin transaction");
+  sql::exec(query, "insert into t1 (c1,c2) values (\"Pete\",10)");
+  sql::exec(query, "rollback transaction");
+
+  /* Verify 3 rows created */
+
+  sql::prepare(query, "select count(*) from t1");
+  sql::exec(query);
+  sql::next(query);
+
+  printf("Row count: %1\n\n", sql::columnValue(query, 0));
+
+  /* Close the UXP */
+
+  sql::freeQuery(query);
+  sf::closeUxp(data);
+
+  /* Reopen the UXP ... includes authentication. */
+
+  printf("Opening new UXP\n\n");
+
+  printf("Credentials necessary to access UXP:\n\n");
+  printf("  Username = SampleUser@myemail.com\n");
+  printf("  Challenge 1 = Response 1\n");
+  printf("  Challenge 2 = Response 2\n");
+  printf("  ... \n");
+  printf("  Challenge 10 = Response 10\n\n");
+
+  data = sf::openUxp(outfile);
+  if (checkError())
+    return 1;
+
+  status = authenticate_uxp(data);
+  if (status != 16)
+  {
+    printf("\nNot authorized\n");
+    return;
+  }
+  else
+  {
+    printf("You're authorized\n");
+  }
+
+  printf("\nFetching all rows using SQL\n\n");
+
+  int i,cnt = 1;
+  string t1, c1, v1;
+  
+  query = sql::newQuery(data);
+
+  sql::prepare(query, "select *,rowid from t1");
+  sql::exec(query);
+
+  cnt = 1;
+
+  while (sql::next(query))
+  {
+    printf("Row: %1\n", cnt++);
+
+    for (i = 0; i < sql::columnCount(query); i++)
+    {
+      t1 = sql::columnTable(query, i);
+      c1 = sql::columnName(query, i);
+      v1 = sql::columnValue(query, i);
+
+      printf("  %1.%2: %3\n", t1, c1, v1);
+    }
+  }
+
+  printf("\nFetching rows using SQL filter: LIKE G%\n\n");
+
+  sql::prepare(query, "select *,rowid from t1 where c1 like ?");
+  sql::bindValue(query, 0, "G%");
+  sql::exec(query);
+
+  cnt = 1;
+
+  while (sql::next(query))
+  {
+    printf("Row: %1\n", cnt++);
+
+    for (i = 0; i < sql::columnCount(query); i++)
+    {
+      t1 = sql::columnTable(query, i);
+      c1 = sql::columnName(query, i);
+      v1 = sql::columnValue(query, i);
+
+      printf("  %1.%2: %3\n", t1, c1, v1);
+    }
+  }
+
+  sql::freeQuery(query);
+  sf::closeUxp(data);
+
+  printf("\nSample finished running\n");
+
+  return 0;
+}
+
+main();

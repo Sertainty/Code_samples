@@ -1,0 +1,371 @@
+/*!
+ \copyright Sertainty Corporation, 2021. All Rights Reserved.
+ 
+ \file     7-delegate_info.uxl
+ 
+ \brief    This sample code tests all the UXL methods that have to do with a Delegate's Journals, Sytem Flags, Access Codes, and more.
+ 
+ \author   Melvin Valdez de la Roca
+ \date     03/08/2021
+ 
+ \note     Application expects to find the necessary source files in the current working folder.
+ */
+
+/*
+ ds::getJournal
+ ds::setSystemFlags
+ ds::getSystemFlags
+ ds::getAccessCode
+ ds::setAccessCode
+ dl::sendDelegateID
+ dl::sendDelegateIDToAddress
+ dl::verifyDelegateID
+ ds::publishUserId
+ ds::getDatabaseParameters
+ ds::setDatabaseParameters
+ */
+
+replace procedure db_info()
+{
+  string user_main = "SampleUser@myemail.com";
+  string user1 = "SampleUser1@myemail.com";
+  string user2 = "SampleUser2@myemail.com";
+  string delegate1 = "Delegate_1";
+  string accessCodeSpec = "10101010101010101010010101010110";
+  string email = "melvin.valdez@sertainty.com";
+  string delegateID = "delegateid";
+  string dbParams = "localhost|1234|password";
+  string userid1 = "ID1";
+  int session;
+  int a, b, c, d, e, f, g, h, i, j, t;
+  list journallist, dbparamlist;
+  bytearray accessCode, systemFlags;
+  bytearray publishid, delegateid;
+  
+  on return
+  {
+    ds::closeSession(session);
+    ds::closeDatabase();
+  }
+  
+  /* Open Database */
+  
+  lib = ds::openDatabase(0);
+  if (errorstring)
+  {
+    printf("Error opening data services database: %1\n", errorstring);
+    return;
+  }
+  else
+  {
+    printf("\nOpened Database");
+  }
+  
+  /* Open Session */
+  
+  session = ds::openSession(user_main);
+  if (errorstring)
+  {
+    printf("Error opening session for data services database: %1\n", errorstring);
+    return;
+  }
+  else
+  {
+    printf("\nOpened Session\n");
+  }
+  
+  authenticate_dsdb_auto(session, user_main);
+  
+  printf("\n- - - GET JOURNALS (BEFORE CHANGES) - - -\n");
+  
+  /* Get Journal */
+  
+  a = ds::getJournalEntry(session, 1, &journallist);
+  if (a == 1)
+  {
+    printf("\n");
+    print(journallist);
+    printf("\n");
+  }
+  else
+  {
+    printf("\n JOURNAL could not get retrieved!\n");
+  }
+  
+  printf("- - - - - - - - - - - - - - - - - - - \n");
+  
+  printf("\n- - - DELETE JOURNALS - - -\n");
+  
+  a = ds::deleteJournalEntry(session, 1);
+  if (a == 1)
+  {
+    printf("\n- Journal records deleted\n");
+  }
+  else
+  {
+    printf("\nError: Journal records could not be deleted\n");
+  }
+  
+  printf("\n- - - - - - - - - - - - - - - - - - - \n");
+  
+  clearList(journallist);
+  
+  printf("\n- - - GET JOURNALS (AFTER CHANGES) - - -\n");
+  
+  /* Get Journal After Changes */
+  
+  a = ds::getJournalEntry(session, 1, &journallist);
+  if (a == 1)
+  {
+    printf("\n");
+    print(journallist);
+    printf("\n");
+  }
+  else
+  {
+    printf("\n- No Journal Entries exist\n");
+  }
+  
+  printf("\n- - - - - - - - - - - - - - - - - - - \n");
+  printf("- - - - - - - - - - - - - - - - - - - \n\n");
+  
+  printf("\n- - - GET ACCESS CODE - - -\n");
+  
+  /* Get Access Code */
+  
+  accessCode = ds::getAccessCode(session);
+  printf("\nAccess Code: %1\n", accessCode);
+  
+  printf("\n- - - - - - - - - - - - - - - - - - - \n");
+  
+  printf("\nSETTING NEW ACCESS CODE\n");
+  b = ds::setAccessCode(session, accessCodeSpec);
+  if (b == 1)
+  {
+    printf("- Set new Access Code!\n");
+  }
+  else
+  {
+    printf("- Error: Setting new Access Code!\n");
+  }
+  
+  /* Get Updated Access Code */
+  
+  printf("\n- - - GET NEW ACCESS CODE - - -\n");
+  accessCode = ds::getAccessCode(session);
+  printf("\nNEW Access Code: %1\n", accessCode);
+  
+  printf("\n\n- - - - - - - - - - - - - - - - - - - \n");
+  printf("- - - - - - - - - - - - - - - - - - - \n\n");
+  
+  printf("\n- - - GET SYSTEM FLAGS - - -\n");
+  
+  systemFlags = ds::getSystemFlags(session);
+  printf("\nSystem Flags: %1\n", systemFlags);
+  
+  printf("\n- - - - - - - - - - - - - - - - - - - \n");
+  
+  printf("\nSET NEW SYSTEM FLAGS\n");
+  c = ds::setSystemFlags(session, 1);
+  if (c == 1)
+  {
+    printf("- Set new System Flags\n");
+  }
+  else
+  {
+    printf("- Error: Setting new System Flags\n");
+  }
+  
+  /* Get Updated System Flags */
+  
+  printf("\n- - - GET NEW SYSTEM FLAGS - - -\n");
+  systemFlags = ds::getSystemFlags(session);
+  printf("\nNEW System Flags: %1\n", systemFlags);
+  
+  printf("\n\n- - - - - - - - - - - - - - - - - - - \n");
+  printf("- - - - - - - - - - - - - - - - - - - \n\n");
+  
+  printf("\nSEND DELEGATE ID TO USER\n");
+  h = dl::sendDelegateID(session, user_main, delegate1, user2);
+  if (h == 1)
+  {
+    printf("\ndl::sendDelegateID() PASS\n");
+  }
+  else
+  {
+    printf("\ndl::sendDelegateID() FAIL\n");
+  }
+  
+  printf("\n- - - - - - - - - - - - - - - - - - - \n");
+  
+  printf("\nSEND DELEGATE ID TO ADDRESS\n");
+  t = dl::sendDelegateIDToAddress(session, user_main, delegate1, email);
+  if (t == 1)
+  {
+    printf("\ndl::sendDelegateIDToAddress() PASS\n");
+  }
+  else
+  {
+    printf("\ndl::sendDelegateIDToAddress() FAIL\n");
+  }
+  
+  printf("\n- - - - - - - - - - - - - - - - - - - \n");
+  
+  printf("\nVERIFY DELEGATE ID\n");
+  g = dl::verifyDelegateID(session, user_main, delegate1, delegateID);
+  if (g == 1)
+  {
+    printf("\ndl::verifyDelegateID() PASS\n");
+  }
+  else
+  {
+    printf("\ndl::verifyDelegateID() FAIL\n");
+  }
+  
+  printf("\n\n- - - - - - - - - - - - - - - - - - - \n");
+  printf("- - - - - - - - - - - - - - - - - - - \n\n");
+  
+  printf("\nPUBLISH USER ID\n");
+  publishid = ds::publishUserId(session, user1, userid1, 0, "");
+  if (errorstring)
+  {
+    printf("Error publishing id: %1\n", errorstring);
+  }
+  else
+  {
+    printf("Published ID!\n");
+    print(publishid);
+  }
+  
+  printf("\n\n- - - - - - - - - - - - - - - - - - - \n");
+  printf("- - - - - - - - - - - - - - - - - - - \n\n");
+  
+  d = ds::getDatabaseParameters(session, &dbparamlist);
+  if (d==1)
+  {
+    printf("\nds::getDatabaseParameters() PASS\n");
+    print(dbparamlist);
+  }
+  else
+  {
+    printf("\nds::getDatabaseParameters() FAIL\n");
+  }
+  
+  e = ds::setDatabaseParameters(session, dbParams);
+  if (d==1)
+  {
+    printf("\nds::setDatabaseParameters() PASS\n");
+  }
+  else
+  {
+    printf("\nds::setDatabaseParameters() FAIL\n");
+  }
+  
+  clearList(dbparamlist);
+  f = ds::getDatabaseParameters(session, &dbparamlist);
+  if (f == 1)
+  {
+    printf("\nds::getDatabaseParameters() PASS\n");
+    print(dbparamlist);
+  }
+  else
+  {
+    printf("\nds::getDatabaseParameters() FAIL\n");
+  }
+  
+  printf("\nSample finished running\n");
+  
+  return 0;
+}
+
+
+replace procedure authenticate_dsdb_auto(session, user)
+{
+  int i, j, status;
+  int cntLine, cntChallenges, cntAuthChallenge, locateSeparator, locateCred;
+  list list2, challenges, auth_challenge, userinfo, challenges_info;
+  string buf, name, outbuf, username, credentials, challenges_name, challenges_pro, challenges_res, challenges_buf;
+  string credFile = "$(SAMPLE)/SampleData/credentials.txt";
+  bytearray specFile;
+  
+  specFile = file::readAll(credFile);
+  
+  /* Get User Info from credentials.txt */
+  
+  userinfo = split(specFile, "\n\n");
+  cntLine = countList(userinfo);
+  
+  /* Extract User info from credentials file and place in list */
+  
+  for (i = 0; i < cntLine; i++)
+  {
+    locateSeparator = locate(getList(userinfo,i), "=");
+    username = substr(getList(userinfo,i), 0, locateSeparator);
+    if (username == user)
+    {
+      locateCred = (locateSeparator + 1);
+      credentials = substr(getList(userinfo,i), locateCred, 500);
+      challenges = split(credentials, "||");
+      cntChallenges = countList(challenges);
+    }
+  }
+  
+  /* Start authentication */
+  
+  for (;;)
+  {
+    status = ds::authenticate(session);
+    
+    switch (status)
+    {
+      case 16:
+        printf("You are authorized\n");
+        return 1;
+        
+      case 1:
+        printf("You are not authorized\n");
+        ds::closeSession(session);
+        ds::closeDatabase();
+        return 0;
+        
+      case 512:
+        buf = ds::getChallenges(session);
+        auth_challenge = split(buf, "|");
+        cntAuthChallenge = countList(auth_challenge);
+        
+        for (i = 0; i < cntAuthChallenge; i++)
+        {
+          name = getList(auth_challenge, i);
+          
+          for (j = 0; j < cntChallenges; j++)
+          {
+            challenges_buf = getList(challenges,j);
+            challenges_info = split(challenges_buf, "|");
+            challenges_name = getList(challenges_info,0);
+            challenges_pro = getList(challenges_info, 1);
+            challenges_res = getList(challenges_info, 2);
+            
+            if (challenges_pro == name)
+            {
+              if(strlen(outbuf) > 0)
+              {
+                outbuf = concat(outbuf, "||");
+              }
+              
+              outbuf = concat(outbuf, challenges_pro, "|", challenges_res);
+            }
+            
+            clearList(challenges_info);
+          }
+        }
+        
+        ds::setResponses(session, outbuf);
+        break;
+        
+      default:
+        return 0;
+    }
+  }
+}
+
+db_info();

@@ -1,0 +1,212 @@
+/*!
+    \copyright Sertainty Corporation, 2020.  All Rights Reserved.
+
+    \file     id_session.uxl
+
+    \brief    This sample demonstrates how to authenticate into an ID session and authenticate using Single Sign-On, into a UXP Object.
+
+    \details  A UXP Object requires authentication of the prospective user (process or person).
+              Access will only be granted after a successful authentication.
+
+              Having to individually authenticate into multiple UXP Objects is time-consuming.
+              Also time-consuming is  authenticating into a single UXP Object multiple times.
+              As a convenience, a UXP Identity can be used for a Single Sign-On session.
+              A Single Sign-On session allows automatic authentication into UXP Objects that were created using that same UXP Identity.
+
+              For authentication, there are two approaches to programatically seeking authorization. 
+              The first approach is to declare a function callback that is called when the system presents challenges. 
+              The callback function is given the list of challenges that it must process and return. 
+              The callback function is called until resolution is reached.
+
+              The second uses a looping process to allow the program to handle the challenge list manually. 
+              Responses are then given back to the system and the authentication loop continues until a resolution is reached.
+
+    \author   Melvin Valdez de la Roca
+    \date     06/26/2020
+
+    \note     Application expects to find the necessary source files in the current working folder.
+ */
+
+replace procedure authenticate_uxp(appHandle)
+{
+  int i, cnt, status;
+  list challenges;
+  string buf, prompt, response, outbuf;
+
+  for (;;)
+  {
+    status = sf::authenticate(appHandle);
+    if (status != 512)
+      break;
+      
+    buf = sf::getChallenges(appHandle);
+    challenges = split(buf, "|");
+    cnt = countList(challenges);
+
+    for (i = 0; i < cnt; i++)
+    {
+      prompt = getList(challenges,i);
+
+      if (strlen(outbuf) > 0)
+      {
+        outbuf = concat(outbuf, "||");
+      }
+
+      if (toUpper(prompt) == "USERNAME")
+      {
+        response = "SampleUser@myemail.com";
+      }
+      else
+      {
+        response = concat("Response ", substr(prompt,10, -1));
+      }
+
+      outbuf = concat(outbuf,prompt,"|",response);
+    }
+
+    sf::setResponses(data, outbuf);
+  }
+   
+  return status;
+}
+
+replace procedure id_session()
+{
+  int appHandle, idHandle, len, status;
+  bytearray buffer;
+  string idFileSpec = "$(SAMPLE)/temp/sampleid.iic";
+  string uxpFileSpec = "$(SAMPLE)/temp/sample.uxp";
+  string dataPdfSpec = "$(SAMPLE)/SampleData/data.pdf";
+  string dataPdf2Spec = "$(SAMPLE)/SampleData/data2.pdf";
+  string copy1Spec = "$(SAMPLE)/temp/copy1.pdf";
+  string copy2Spec = "$(SAMPLE)/temp/copy2.pdf";
+
+  printf("\nSample SSO using UXL\n\n");
+
+  /* Create new UXP Object using new UXP Identity */
+
+  appHandle = sf::newUxp(uxpFileSpec, idFileSpec, "IDFile|Replace");
+  if (errorstring)
+  {
+    printf("Error creating new UXP: %1\n", errorstring);
+    return;
+  }
+
+  /* Create a new virtual file inside the Data */
+
+  sf::addFile(appHandle, "data.pdf", dataPdfSpec, -1, -1, "Compress");
+  if (errorstring)
+  {
+    printf("Error adding data to UXP: %1\n", errorstring);
+    return;
+  }
+
+  sf::addFile(appHandle, "data2.pdf", dataPdf2Spec, -1, -1, 0);
+  if (errorstring)
+  {
+    printf("Error adding data to UXP: %1\n", errorstring);
+    return;
+  }
+
+  /* Now, open the first virtual file and write it out to a temporary file */
+
+  int fileHandle = sf::openFile(appHandle, "data.pdf");
+  if (errorstring)
+  {
+    printf("Error opening virtual file: %1\n", errorstring);
+    return;
+  }
+
+  printf("Reading data.pdf in loop... ");
+  string fp = file::open(copy1Spec, "wb");
+  while (sf::readFile(appHandle, fileHandle, buffer, 100000))
+  {
+    len = strlen(buffer);
+    file::write(buffer, len, 1, fp);
+  }
+
+  file::close(fp);
+
+  /* Close Virtual File */
+
+  sf::closeFile(appHandle, fileHandle);
+
+  printf("finished reading data.pdf\n");
+
+  /* Compare the extracted file with the copy inside the Data */
+ 
+  if (sf::compareExternalFile(appHandle, "data.pdf", copy1Spec))
+  {
+    printf("Comparison of data.pdf to copy1.pdf: successful\n");
+  }
+  else
+  {
+    printf("Comparison of data.pdf to copy1.pdf: failed\n");
+  }
+
+  /* Close the UXP Object. This will delete the handle as well. */
+
+  sf::closeUxp(appHandle);
+
+  printf("Opening ID for SSO session\n");
+
+  printf("\nCredentials necessary to initiate SSO session:\n");
+  printf("  Username = SampleUser@myemail.com\n");
+  printf("  Challenge 1 = Response 1\n");
+  printf("  Challenge 2 = Response 2\n");
+  printf("  ... \n");
+  printf("  Challenge 10 = Response 10\n\n");
+
+  appHandle = sf::openUxp(uxpFileSpec, "ShareReadOnly");
+  if (errorstring)
+  {
+    printf("\nError opening UXP: %1\n", errorstring);
+    return;
+  }
+
+  status = authenticate_uxp(appHandle);
+  if (status != 16)
+  {
+    printf("You are not authorized\n");
+    return;
+  }
+  else
+  {
+    printf("You are authorized\n");
+  }
+
+  printf("\nExtracting data.pdf to copy2.pdf\n");
+
+  sf::exportFile(appHandle, "data.pdf", copy2Spec, "Replace");
+  if (errorstring)
+  {
+    printf("Error exporting virtual file: %1\n", errorstring);
+  }
+
+  if (sf::compareExternalFile(appHandle, "data.pdf", copy2Spec))
+  {
+    printf("Comparison of data.pdf to copy2.pdf: successful\n");
+  }
+  else
+  {
+    printf("Comparison of data.pdf to copy2.pdf: failed\n");
+  }
+
+  /* Close up again and free handle */
+
+  sf::closeUxp(appHandle);
+  if (errorstring)
+  {
+    printf("Error closing Uxp: %1\n", errorstring);
+    return;
+  }
+
+  printf("\nYou successfully authenticated into an Id Session and used it to auto-authenticate into a UXP.\n");
+  printf("You may try out other advanced samples now.\n");
+
+  printf("\nSample finished running\n");
+
+  return 0;
+}
+
+id_session();
