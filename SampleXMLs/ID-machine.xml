@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <!---->
-<!-- ID Definition: Mel-machine-example -->
+<!-- ID Definition: Admin-machine-example -->
 <!---->
 <!-- Date: 2020-07-19T19:22:55 -->
 <!---->
-<ID name="Mel-machine-example">
+<ID name="Admin-machine-example">
   <Description type="string"></Description>
   <Expiration type="date">2120-07-19T19:20:42</Expiration>
   <PersonalName1 type="string"></PersonalName1>
@@ -189,7 +189,7 @@
   </Rules>
   <!---->
   <Users>
-    <User name="mel-machine" type="Personal">
+    <User name="Admin-machine" type="Personal">
       <Enabled type="bool">true</Enabled>
       <Email type="string">admin@sertainty.com/Email>
       <Expiration type="date">2120-07-19T19:20:42</Expiration>
