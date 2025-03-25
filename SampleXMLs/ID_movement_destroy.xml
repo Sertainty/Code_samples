@@ -87,19 +87,19 @@ See Restrictions  and Configurations tabs, movement violation set to destroy dat
     <!---->
     <Rule name="ConfigurationSetup">
       <Configurations>
-        <Configuration id="2857759023" name="FranklinTN-msw-Weed-MBP-2">
+        <Configuration id="2857759023" name="NashvilleTN-msw-MBP-2">
           <Enabled type="bool">true</Enabled>
           <!---->
-          <Device id="1665407208" name="msw-Weed-MBP-2">
-            <FilePath>/Users/mweed/Desktop/WorkingDirectory/Training/Filepath1</FilePath>
-            <FilePath>/Users/mweed/Desktop/WorkingDirectory/Training/Filepath2</FilePath>
+          <Device id="1665407208" name="msw-MBP-2">
+            <FilePath>/Users/admin/Desktop/WorkingDirectory/Training/Filepath1</FilePath>
+            <FilePath>/Users/admin/Desktop/WorkingDirectory/Training/Filepath2</FilePath>
             <Architecture type="string">x86_64</Architecture>
             <CpuModel type="string">Intel(R) Core(TM) i9-8950HK CPU @ 2.90GHz</CpuModel>
             <CpuSN type="string"></CpuSN>
             <CpuVendor type="string">GenuineIntel</CpuVendor>
             <DeviceType type="string">Mobile Device</DeviceType>
             <MachineModel type="string">MacBookPro15,1</MachineModel>
-            <MachineName type="string">Weed-MBP-2</MachineName>
+            <MachineName type="string">admin-MBP-2</MachineName>
             <MachineSN type="string">C02XT026JGH7</MachineSN>
             <MachineUUID type="string">565E4C46-9682-5759-BBCA-47A6561C3CA7</MachineUUID>
             <MachineVendor type="string">Apple</MachineVendor>
@@ -115,9 +115,9 @@ See Restrictions  and Configurations tabs, movement violation set to destroy dat
             <Vendor type="string">Apple</Vendor>
           </Device>
           <!---->
-          <Location id="1915884539" name="FranklinTN">
-            <Address type="string">5723 Quest Ridge Rd</Address>
-            <City type="string">Franklin</City>
+          <Location id="1915884539" name="NashvilleTN">
+            <Address type="string">1234 Ridge Rd</Address>
+            <City type="string">Nashville</City>
             <Country type="string">US</Country>
             <IpAddress type="string">99.122.1.103/192.168.1.80/192.168.1.69</IpAddress>
             <Latitude type="string">35.93</Latitude>
@@ -206,14 +206,14 @@ See Restrictions  and Configurations tabs, movement violation set to destroy dat
         <Masking type="string">0</Masking>
         <!---->
         <HomeConfiguration>
-          <Configuration id="4204943273" name="FranklinTN-msw-Weed-MBP-2">
+          <Configuration id="4204943273" name="NashvilleTN-msw-MBP-2">
             <Enabled type="bool">true</Enabled>
             <!---->
-            <Device id="1665407208" name="msw-Weed-MBP-2" />
+            <Device id="1665407208" name="msw-MBP-2" />
             <!---->
-            <Location id="3377464538" name="FranklinTN">
-              <Address type="string">5723 Quest Ridge Rd</Address>
-              <City type="string">Franklin</City>
+            <Location id="3377464538" name="NashvilleTN">
+              <Address type="string">1234 Ridge Rd</Address>
+              <City type="string">Nashville</City>
               <Country type="string">US</Country>
               <IpAddress type="string">99.122.1.103/192.168.1.80/192.168.1.69</IpAddress>
               <Latitude type="string">35.93</Latitude>
