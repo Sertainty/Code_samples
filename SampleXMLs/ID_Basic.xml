@@ -155,14 +155,14 @@
         <Masking type="string">0</Masking>
         <!---->
         <HomeConfiguration>
-          <Configuration id="3077663052" name="FranklinTN-msw-Weed-MBP-2">
+          <Configuration id="3077663052" name="NashvilleTN-msw-MBP-2">
             <Enabled type="bool">true</Enabled>
             <!---->
-            <Device id="1665407208" name="msw-Weed-MBP-2" />
+            <Device id="1665407208" name="msw-MBP-2" />
             <!---->
-            <Location id="186256501" name="FranklinTN">
-              <Address type="string">5723 Quest Ridge Rd</Address>
-              <City type="string">Franklin</City>
+            <Location id="186256501" name="NashvilleTN">
+              <Address type="string">1234 Ridge Rd</Address>
+              <City type="string">Nashville</City>
               <Country type="string">US</Country>
               <IpAddress type="string">99.122.1.103/192.168.1.80</IpAddress>
               <Latitude type="string">35.93</Latitude>
