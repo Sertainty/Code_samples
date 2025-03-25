@@ -1,0 +1,52 @@
+/* Workflow test - creates smartfile
+
+   Run this procedure to create a test file.
+*/
+
+replace procedure create()
+{
+  string recbuf, mult_str;
+  int index, handle;
+  int sf, mult;
+  string vname = "Workflow.data";
+  printf("\nWorkflow Sample Data Creator\n\n");
+  on return
+    {
+      sf::closeUxp(sf);
+      sf::closeIndex(index);
+    }
+
+  printf("The multiplier directs the engine to replicate the same input\n");
+  printf("data 'N' times, thus, producing a desired sample size.  The current\n");
+  printf("source file contains 501 records, so multiplying by 2 would\n");
+  printf("create 1002 records.\n\n");
+
+  mult_str = x::prompt("Data multiplier <1>? ", "1");
+  mult = mult_str;
+
+  printf("\nCreating SmartFile\n");
+
+  startStats();
+
+  sf = sf::newUxp("Workflow.uxp", "Workflow.kcl", "KclFile|Replace");
+  if (sf <= 0)
+  {
+    printf("\n*** Error: %1\n", errorstring);
+    return error;
+  }
+
+  sf::addFileForTest(sf, vname, vname, 10000, 5, mult, "");
+  sf::setAttribute(sf, "NAME", "Workflow Test");
+  sf::setAttribute(sf, "DESCRIPTION", "Tests a workflow appliance for data access");
+
+  sf::showAttributes(sf);
+  printf("\nSample UXP has %1 records\n", 501 * mult);
+
+  sf::closeUxp(sf);
+
+  printf("\nClosing UXP\n\n");
+
+  showStats();
+}
+
+create();

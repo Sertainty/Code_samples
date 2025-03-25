@@ -1,0 +1,106 @@
+/* Workflow test */
+
+replace procedure testWorkflow()
+{
+  int rec, maxrec, start,end, target, tmptarget;
+  bytearray buf;
+  string recbuf, mult_str;
+  int index, tmpmult, handle;
+  int sf, mult, fsize = 888824;
+  string vname = "Workflow.data";
+  printf("\nWorkflow Test\n\n");
+  on return
+    {
+      sf::closeUxp(sf);
+      sf::closeIndex(index);
+    }
+
+  printf("Sample data must already exist.\n\n");
+  printf("The multiplier should be less than or equal to the multiplier\n");
+  printf("used to create the sample UXP.\n\n");
+
+  mult_str = x::prompt("Data multiplier <1>? ", "1");
+  mult = mult_str;
+  printf("\nSample UXP should have %1 records\n", 501 * mult);
+
+  printf("\nOpening UXP\n");
+
+  sf = sf::openUxp("$(SAMPLE)/temp/Workflow.uxp","READONLY", "Username=test1|test2=test2|test3=test3|test4=test4");
+  if (sf <= 0)
+  {
+    printf("\n*** Error: %1\n", errorstring);
+    return error;
+  }
+
+  printf("\nReading indexed data\n\n");
+
+  index = sf::openIndex("$(SAMPLE)/8-WorkflowDemo/WorkflowIndex.csv", &rec);
+  if (index > 0)
+  {
+    maxrec = rec * mult;
+    printf("Index records: %1\n",maxrec);
+
+    handle = sf::openFile(sf, vname);
+
+    for (;;)
+    {
+      recbuf = x::prompt("Record # <Exit>? ", "Exit");
+      if (toupper(recbuf) == "EXIT")
+        break;
+
+      target = recbuf;
+
+      if (target <= 0)
+      {
+        printf("Record value must be greater than zero\n");
+      }
+      else if (target <= rec)
+      {
+        sf::fetchIndex(index, target, &start, &end);
+
+        printf("Record: %1  Offset: %2   %3\n", target,start,end);
+        sf::seekFile(sf, handle, start);
+        sf::readFile(sf, handle, &buf, end - start);
+        printf("%1\n",buf);
+      }
+      else if (target <= maxrec)
+      {
+        tmpmult = (target / rec);
+        tmptarget = target % rec;
+        if (!tmptarget)
+        {
+          tmpmult--;
+          tmptarget = rec;
+        }
+
+        sf::fetchIndex(index, tmptarget, &start, &end);
+
+        start += fsize * tmpmult;
+        end += fsize * tmpmult;
+
+        printf("Record: %1  Offset: %2   %3\n", target,start,end);
+
+        sf::seekFile(sf, handle, start);
+        sf::readFile(sf, handle, &buf, end - start);
+        printf("%1\n",buf);
+      }
+      else
+      {
+        printf("Record %1 not found.  Max: %2\n",target, maxrec);
+      }
+    }
+    
+    sf::closeFile(sf, handle);
+  }
+  else
+  {
+    printf("Index has no records\n");
+  }
+  
+  sf::closeIndex(index);
+  sf::closeUxp(sf);
+
+  printf("\nClosing index and UXP\n");
+}
+
+testWorkflow();
