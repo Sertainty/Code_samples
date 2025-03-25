@@ -1,0 +1,90 @@
+<helper>
+  <include>common</include>
+  
+  <brief>Opens and Authenticates a UXP</brief>
+  
+  <collection name="C">
+    <brief>Opens and Authenticates a UXP using C.</brief>
+    
+    <file name="1-C_samples/open_uxp_auth.c">
+      <brief>Opens and Authenticates a UXP from C.</brief>
+      <description>Demonstrates how you can authenticate into an ID session
+      and use it to auto-authenticate, also known as, Sertainty single sign-on, into a UXP.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="10-SampleSupportFiles/sampleid.xml">
+      <brief>ID definition in XML format.</brief>
+      <description>Defines a complete id, including rules and the user SampleUser@myemail.com</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+    </file>
+  </collection>
+  
+  <collection name="C++">
+    <brief>Opens and Authenticates a UXP using C++.</brief>
+    
+    <file name="2-CPP_samples/open_uxp_auth.cpp">
+      <brief>Opens and Authenticates a UXP from C++.</brief>
+      <description>Demonstrates how you can authenticate into an ID session
+      and use it to auto-authenticate, also known as, Sertainty single sign-on, into a UXP.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="10-SampleSupportFiles/sampleid.xml">
+      <brief>ID definition in XML format.</brief>
+      <description>Defines a complete id, including rules and the user SampleUser@myemail.com</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+    </file>
+  </collection>
+  
+  <collection name="C#">
+    <brief>Opens and Authenticates a UXP using C#.</brief>
+    
+    <file name="3-CS_samples/open_uxp_auth.cs">
+      <brief>Opens and Authenticates a UXP from C#.</brief>
+      <description>Demonstrates how you can authenticate into an ID session
+        and use it to auto-authenticate, also known as, Sertainty single sign-on, into a UXP.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="10-SampleSupportFiles/sampleid.xml">
+      <brief>ID definition in XML format.</brief>
+      <description>Defines a complete id, including rules and the user SampleUser@myemail.com</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+    </file>
+  </collection>
+  
+  <collection name="UXL">
+    <brief>Opens and Authenticates a UXP using UXL</brief>
+    
+    <file name="4-UXL_samples/open_uxp_auth.uxl">
+      <brief>Opens and Authenticates a UXP from UXL</brief>
+      <description>Demonstrates how you can authenticate into an ID session
+      and use it to auto-authenticate, also known as, Sertainty single sign-on, into a UXP.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="10-SampleSupportFiles/sampleid.xml">
+      <brief>ID definition in XML format.</brief>
+      <description>Defines a complete id, including rules and the user SampleUser@myemail.com</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+    </file>
+  </collection>
+  
+</helper>

@@ -1,0 +1,91 @@
+<helper>
+  <include>common</include>
+  
+  <brief>ID creation using XML</brief>
+  
+  <collection name="C">
+    <brief>ID creation using C.</brief>
+    
+    <file name="1-C_samples/id_from_xml.c">
+      <brief>ID creation using C.</brief>
+      <description>This program demonstrates how one can create a Sertainty ID (.iic) file from an
+        ID definition (.xml) file. The generated ID (.iic) file can be used to protect data.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="10-SampleSupportFiles/sampleid.xml">
+      <brief>ID definition in XML format.</brief>
+      <description>Defines a complete id, including rules and the user SampleUser@myemail.com</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+    </file>
+  </collection>
+  
+  <collection name="C++">
+    <brief>ID creation using C++.</brief>
+    
+    <file name="2-CPP_samples/id_from_xml.cpp">
+      <brief>ID creation using C++.</brief>
+      <description>This program demonstrates how one can create a Sertainty ID (.iic) file from
+        an ID definition (.xml) file. The generated ID (.iic) file can be used to protect data.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="10-SampleSupportFiles/sampleid.xml">
+      <brief>ID definition in XML format.</brief>
+      <description>Defines a complete id, including rules and the user SampleUser@myemail.com</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+    </file>
+  </collection>
+  
+  <collection name="C#">
+    <brief>ID creation using C#.</brief>
+    
+    <file name="3-CS_samples/id_from_xml.cs">
+      <brief>ID creation using C#.</brief>
+      <description>This program demonstrates how one can create a Sertainty ID (.iic) file
+        from an ID definition (.xml) file. The generated ID (.iic) file can be used to protect data.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="10-SampleSupportFiles/sampleid.xml">
+      <brief>ID definition in XML format.</brief>
+      <description>Defines a complete id, including rules and the user SampleUser@myemail.com</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+    </file>
+  </collection>
+  
+  <collection name="UXL">
+    <brief>ID creation using UXL</brief>
+    
+    <file name="4-UXL_samples/id_from_xml.uxl">
+      <brief>Creates an ID .</brief>
+      <description>This program demonstrates how one can create a Sertainty ID (.iic) file
+      from an ID definition (.xml) file. The generated ID (.iic) file can be
+      used to protect data.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="10-SampleSupportFiles/sampleid.xml">
+      <brief>ID definition in XML format.</brief>
+      <description>Defines a complete id, including rules and the user SampleUser@myemail.com</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+    </file>
+  </collection>
+  
+</helper>

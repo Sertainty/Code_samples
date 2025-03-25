@@ -1,0 +1,26 @@
+<helper>
+  <include>common</include>
+  
+  <brief>Recording UXP events to Data Services</brief>
+    
+  <collection name="UXL">
+    <brief>Recording UXP events using UXL</brief>
+    
+    <file name="4-UXL_samples/uxp_events.uxl">
+      <brief>UXP SQL from UXL</brief>
+      <description>This program shows how you can record UXP events at a registered Data Services server.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="10-SampleSupportFiles/sampleid.xml">
+      <brief>ID definition in XML format.</brief>
+      <description>Defines a complete id, including rules and the user SampleUser@myemail.com</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+    </file>
+  </collection>
+  
+</helper>

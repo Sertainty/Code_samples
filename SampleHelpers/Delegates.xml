@@ -1,0 +1,274 @@
+<helper>
+  <include>common</include>
+  
+  <brief>Delegate Management</brief>
+  
+  <collection name="C">
+    <brief>ID creation using C.</brief>
+    
+    <file name="1-C_samples/1-delegate_create_db.c">
+      <brief>Create a database.</brief>
+      <description>Create a new Data Services (DS) Database and use it to manage Delegates.
+      This sample allows you to create a new DS Database with an existing known ID file.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="1-C_samples/2-delegate_open_session.c">
+      <brief>Opens a management session.</brief>
+      <description>Open an existing Data Services (DS) Database.
+      This sample allows you to open an existing DS Database and authenticate into it to create a DS Session.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="1-C_samples/3-delegate_set_server.c">
+      <brief>Sets the delegate server location.</brief>
+      <description>Set Data Services (DS) Service location in DS Database.
+      This sample sets the Server location in DS Database.
+      This server is where the DS DB management interface is expected to be present.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="1-C_samples/5-delegate_add_delegates.c">
+      <brief>Create new delegate.</brief>
+      <description>Create a new Delegate and add a Subscription to Data Services (DS) Database.
+      The Delegate is only added if it doesn't already exist in the DB.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+  <file name="1-C_samples/4-delegate_add_users.c">
+    <brief>Adds a user to database.</brief>
+    <description>Add a new user to the Data Services (DS) Database.
+    A user is only added if it doesn't already exist in the DB.</description>
+    
+    <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+    
+    <start_line>1</start_line>
+  </file>
+  
+  <file name="10-SampleSupportFiles/sampleid.xml">
+    <brief>ID definition in XML format.</brief>
+    <description>Defines a complete id, including rules and the user SampleUser@myemail.com</description>
+    
+    <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+  </file>
+  
+  </collection>
+  
+  <collection name="C++">
+    <brief>ID creation using C++.</brief>
+    
+    <file name="2-CPP_samples/1-delegate_create_db.cpp">
+      <brief>Create a database.</brief>
+      <description>Create a new Data Services (DS) Database and use it to manage Delegates.
+        This sample allows you to create a new DS Database with an existing known ID file.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="2-CPP_samples/2-delegate_open_session.cpp">
+      <brief>Opens a management session.</brief>
+      <description>Open an existing Data Services (DS) Database.
+        This sample allows you to open an existing DS Database and authenticate into it to create a DS Session.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="2-CPP_samples/3-delegate_set_server.cpp">
+      <brief>Sets the delegate server location.</brief>
+      <description>Set Data Services (DS) Service location in DS Database.
+        This sample sets the Server location in DS Database.
+        This server is where the DS DB management interface is expected to be present.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="2-CPP_samples/5-delegate_add_delegates.cpp">
+      <brief>Create new delegate.</brief>
+      <description>Create a new Delegate and add a Subscription to Data Services (DS) Database.
+        The Delegate is only added if it doesn't already exist in the DB.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>128</start_line>
+    </file>
+    
+    <file name="2-CPP_samples/4-delegate_add_users.cpp">
+      <brief>Adds a user to database.</brief>
+      <description>Add a new user to the Data Services (DS) Database.
+        A user is only added if it doesn't already exist in the DB.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="10-SampleSupportFiles/sampleid.xml">
+      <brief>ID definition in XML format.</brief>
+      <description>Defines a complete id, including rules and the user SampleUser@myemail.com</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+    </file>
+    
+  </collection>
+  
+  <collection name="C#">
+    <brief>ID creation using C#.</brief>
+    
+    <file name="3-CS_samples/1-delegate_create_db.cs">
+      <brief>Create a database.</brief>
+      <description>Create a new Data Services (DS) Database and use it to manage Delegates.
+        This sample allows you to create a new DS Database with an existing known ID file.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="3-CS_samples/2-delegate_open_session.cs">
+      <brief>Opens a management session.</brief>
+      <description>Open an existing Data Services (DS) Database.
+        This sample allows you to open an existing DS Database and authenticate into it to create a DS Session.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>130</start_line>
+    </file>
+    
+    <file name="3-CS_samples/3-delegate_set_server.cs">
+      <brief>Sets the delegate server location.</brief>
+      <description>Set Data Services (DS) Service location in DS Database.
+        This sample sets the Server location in DS Database.
+        This server is where the DS DB management interface is expected to be present.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="3-CS_samples/5-delegate_add_delegates.cs">
+      <brief>Create new delegate.</brief>
+      <description>Create a new Delegate and add a Subscription to Data Services (DS) Database.
+        The Delegate is only added if it doesn't already exist in the DB.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="3-CS_samples/4-delegate_add_users.cs">
+      <brief>Adds a user to database.</brief>
+      <description>Add a new user to the Data Services (DS) Database.
+        A user is only added if it doesn't already exist in the DB.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="10-SampleSupportFiles/sampleid.xml">
+      <brief>ID definition in XML format.</brief>
+      <description>Defines a complete id, including rules and the user SampleUser@myemail.com</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+    </file>
+  </collection>
+  
+  <collection name="UXL">
+    <brief>Delegate management using UXL.</brief>
+    
+    <file name="4-UXL_samples/sample_workflow_delegate.uxl">
+      <brief>End-to-end delegate example.</brief>
+      <description>Demonstrates a complete delegate example which includes creating a database, opening a database and using delegates.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="4-UXL_samples/1-delegate_create_db.uxl">
+      <brief>Create a database.</brief>
+      <description>Create a new Data Services (DS) Database and use it to manage Delegates.
+        This sample allows you to create a new DS Database with an existing known ID file.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="4-UXL_samples/2-delegate_open_session.uxl">
+      <brief>Opens a management session.</brief>
+      <description>Open an existing Data Services (DS) Database.
+        This sample allows you to open an existing DS Database and authenticate into it to create a DS Session.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>130</start_line>
+    </file>
+    
+    <file name="4-UXL_samples/3-delegate_set_server.uxl">
+      <brief>Sets the delegate server location.</brief>
+      <description>Set Data Services (DS) Service location in DS Database.
+        This sample sets the Server location in DS Database.
+        This server is where the DS DB management interface is expected to be present.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="4-UXL_samples/5-delegate_add_delegates.uxl">
+      <brief>Create new delegate.</brief>
+      <description>Create a new Delegate and add a Subscription to Data Services (DS) Database.
+        The Delegate is only added if it doesn't already exist in the DB.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>128</start_line>
+    </file>
+    
+    <file name="4-UXL_samples/4-delegate_add_users.uxl">
+      <brief>Adds a user to database.</brief>
+      <description>Add a new user to the Data Services (DS) Database.
+        A user is only added if it doesn't already exist in the DB.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="4-UXL_samples/webservice.uxl">
+      <brief>Demonstrates web service access.</brief>
+      <description>Demonstrates UXL access to Sertainty Services via the Web Service API.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="10-SampleSupportFiles/sampleid.xml">
+      <brief>ID definition in XML format.</brief>
+      <description>Defines a complete id, including rules and the user SampleUser@myemail.com</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+    </file>
+  </collection>
+  
+</helper>

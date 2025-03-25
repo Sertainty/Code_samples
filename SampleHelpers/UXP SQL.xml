@@ -1,0 +1,69 @@
+<helper>
+  <include>common</include>
+  
+  <brief>Using UXP SQL to store data</brief>
+  
+  <collection name="C">
+    <brief>UXP SQL using C.</brief>
+    
+    <file name="1-C_samples/sample_workflow_sql.c">
+      <brief>UXP SQL from C.</brief>
+      <description>This program shows how you can utilize UXP SQL using a Sertainty ID
+      and add data files into the created UXP file.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="10-SampleSupportFiles/sampleid.xml">
+      <brief>ID definition in XML format.</brief>
+      <description>Defines a complete id, including rules and the user SampleUser@myemail.com</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+    </file>
+  </collection>
+  
+  <collection name="C++">
+    <brief>UXP SQL using C++.</brief>
+    
+    <file name="2-CPP_samples/sample_workflow_sql.cpp">
+      <brief>UXP SQL from C++.</brief>
+      <description>This program shows how you can utilize UXP SQL using a Sertainty ID
+      and add data files into the created UXP file.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="10-SampleSupportFiles/sampleid.xml">
+      <brief>ID definition in XML format.</brief>
+      <description>Defines a complete id, including rules and the user SampleUser@myemail.com</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+    </file>
+  </collection>
+  
+  <collection name="UXL">
+    <brief>UXP SQL using UXL</brief>
+    
+    <file name="4-UXL_samples/sample_workflow_sql.uxl">
+      <brief>UXP SQL from UXL</brief>
+      <description>This program shows how you can utilize UXP SQL using a Sertainty ID
+      and add data files into the created UXP file.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="10-SampleSupportFiles/sampleid.xml">
+      <brief>ID definition in XML format.</brief>
+      <description>Defines a complete id, including rules and the user SampleUser@myemail.com</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+    </file>
+  </collection>
+  
+</helper>

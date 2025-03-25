@@ -1,0 +1,17 @@
+<helper>
+  <!-- Fixed highlights
+       
+       Values for lighter and darker tag attributes range from 0 to 200.
+  -->
+
+  <keywords color="black" lighter="-1"/>
+  <quotes color="blue" lighter="-1"/>
+  <comments color="yellow" lighter="160"/>
+  <xmlquotes color="black" lighter="-1"/>
+  
+  <current_line color="gray" lighter="160"/>
+
+  <!-- Example custom highlight .. to use, replace the string regex-pattern with an actual pattern -->
+  
+  <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+</helper>

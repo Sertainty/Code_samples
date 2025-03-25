@@ -1,0 +1,62 @@
+<helper>
+  <include>common</include>
+  
+  <brief>Fetch current hardware and location configuration.</brief>
+  
+  <collection name="C">
+    <brief>Fetch current hardware and location configuration using C.</brief>
+    
+    <file name="1-C_samples/sample_config.c">
+      <brief>Fetch current hardware and location configuration from C.</brief>
+      <description>Demonstrates how you can authenticate into an ID session
+      and use it to auto-authenticate, also known as, Sertainty single sign-on, into a UXP.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+  </collection>
+  
+  <collection name="C++">
+    <brief>Fetch current hardware and location configuration using C++.</brief>
+    
+    <file name="2-CPP_samples/sample_config.cpp">
+      <brief>Fetch current hardware and location configuration from C++.</brief>
+      <description>Demonstrates how you can authenticate into an ID session
+      and use it to auto-authenticate, also known as, Sertainty single sign-on, into a UXP.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+  </collection>
+  
+  <collection name="C#">
+    <brief>Fetch current hardware and location configuration using C#.</brief>
+    
+    <file name="3-CS_samples/sample_config.cs">
+      <brief>Fetch current hardware and location configuration from C#.</brief>
+      <description>Demonstrates how you can authenticate into an ID session
+        and use it to auto-authenticate, also known as, Sertainty single sign-on, into a UXP.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+  </collection>
+  
+  <collection name="UXL">
+    <brief>Fetch current hardware and location configuration using UXL</brief>
+    
+    <file name="4-UXL_samples/sample_config.uxl">
+      <brief>Fetch current hardware and location configuration from UXL</brief>
+      <description>Demonstrates how you can authenticate into an ID session
+      and use it to auto-authenticate, also known as, Sertainty single sign-on, into a UXP.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+  </collection>
+  
+</helper>

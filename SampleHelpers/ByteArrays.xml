@@ -1,0 +1,62 @@
+<helper>
+  <include>common</include>
+  
+  <brief>Using Sertainty ByteArrays</brief>
+  
+  <collection name="C">
+    <brief>ID creation using C.</brief>
+    
+    <file name="1-C_samples/bytearrays.c">
+      <brief>ByteArrays using C.</brief>
+      <description>The sample demonstrates writing data to and reading data from the uxlByteArray.
+      It also demonstrates loading contents of a file read from the file system into the uxlByteArray.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+  </collection>
+  
+  <collection name="C++">
+    <brief>ID creation using C++.</brief>
+    
+    <file name="2-CPP_samples/bytearrays.cpp">
+      <brief>ByteArrays using C++.</brief>
+      <description>The sample demonstrates writing data to and reading data from the uxl::bytearray.
+        It also demonstrates loading contents of a file read from the file system into the uxl::bytearray.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+  </collection>
+  
+  <collection name="C#">
+    <brief>ID creation using C#.</brief>
+    
+    <file name="3-CS_samples/bytearrays.cs">
+      <brief>ByteArrays using C#.</brief>
+      <description>The sample demonstrates writing data to and reading data from the uxlByteArray.
+      It also demonstrates loading contents of a file read from the file system into the uxlByteArray.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+  </collection>
+  
+  <collection name="UXL">
+    <brief>ID creation using UXL</brief>
+    
+    <file name="4-UXL_samples/bytearrays.uxl">
+      <brief>ByteArrays using UXL.</brief>
+      <description>The sample demonstrates writing data to and reading data from the bytearray.
+      It also demonstrates loading contents of a file read from the file system into the bytearray.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+  </collection>
+  
+</helper>

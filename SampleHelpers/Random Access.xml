@@ -1,0 +1,57 @@
+<helper>
+  <include>common</include>
+  
+  <brief>Demonstrates random access from a UXP</brief>
+  
+  <collection name="UXL">
+    <brief>Demonstrates random access from a UXP using UXL</brief>
+    
+    <file name="8-WorkflowDemo/WorkflowCreate.uxl">
+      <brief>Creates a generated data set.</brief>
+      <description>The WorkflowDemo first creates an auto-generated set of records.  The number of records is user-selectable.  Each record is variable length.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="8-WorkflowDemo/WorkflowRun.uxl">
+      <brief>Allows a user to randomaly fetch a record.</brief>
+      <description>Each record in the generated data set has been assigned a number ranging from 1 to the total number of records.  A generated index maps the logical record to a physical byte offset, which is then used to fetch the desired record in sub-second time.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="8-WorkflowDemo/WorkflowCreateRun.uxl">
+      <brief>Creates a generated data set and then runs the access routine.</brief>
+      <description>Each record in the generated data set has been assigned a number ranging from 1 to the total number of records.  A generated index maps the logical record to a physical byte offset, which is then used to fetch the desired record in sub-second time.  Note, this is the same as running WorkflowCreate.uxl followed by WorkflowRun.uxl.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+      
+      <start_line>1</start_line>
+    </file>
+    
+    <file name="8-WorkflowDemo/Workflow.kcl">
+      <brief>ID definition in KCL format.</brief>
+      <description>Defines a complete id, including rules and the user test1.</description>
+      
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+    </file>
+
+    <file name="8-WorkflowDemo/Workflow.data">
+      <brief>Clear source data used to generated UXP.</brief>
+      <description>A pre-defined data set that is used to create the random access sample.</description>
+    
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+    </file>
+    <file name="8-WorkflowDemo/WorkflowIndex.csv">
+      <brief>A CSV that maps logical records.</brief>
+      <description>Physically maps logical records to physical bytes offsets.  The index is loaded into an internal structure by the demo and allows the user to reference logicals records by number.  Each entry in the CSV represents a start and end offset.</description>
+  
+      <highlight color="black" lighter="-1" darker="-1" match="1">regex-pattern</highlight>
+    </file>
+  </collection>
+  
+</helper>
