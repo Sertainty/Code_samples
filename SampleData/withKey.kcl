@@ -1,0 +1,281 @@
+/*! \copyright Sertainty Corporation, 2012.  All Rights Reserved.
+
+    \file     sample.kcl
+
+    \details  Key code used for internal, private uxp objects.  This KCL
+              does not tolerate missed challenges.
+
+    \author   gsmith
+    \date     02/06/2016
+ */
+
+/**
+ * Called by UXP when the user wishes to initialize object structures
+ * from fixed settings within this file.
+ */
+rule NewAppliance::setup()
+{
+  depends on rule commonSetup(success);
+
+  CredentialType cred;
+  ChallengeType ch;
+
+  /* Define the base credential */
+
+  cred.Name = "Sample User";
+  cred.TimeLow = 0;
+  cred.TimeHigh = 10;
+  cred.ValidationType = ValidationLocal;
+  cred.Privileges = AccessRead | AccessReadEvents;
+
+  cred.Schedule.Sunday = cred.Schedule.Saturday = true;
+  cred.Schedule.Monday = cred.Schedule.Tuesday = cred.Schedule.Wednesday = true;
+  cred.Schedule.Thursday = cred.Schedule.Friday = true;
+  cred.Schedule.StartHour = cred.Schedule.EndHour = -1;
+  cred.Schedule.StartMinute = cred.Schedule.EndMinute = -1;
+  cred.Schedule.StartDay = cred.Schedule.EndDay = -1;
+  cred.Schedule.StartMonth = cred.Schedule.EndMonth = -1;
+  cred.Schedule.StartYear = cred.Schedule.EndYear = -1;
+
+  defineCredential(cred);
+
+  /* Add challenges */
+
+  ch.Name = "USERNAME";
+  ch.Prompt = "User";
+  ch.Value = "sample";
+  ch.TimeLow = 0;
+  ch.TimeHigh = 10;
+  ch.DataType = DataTypeString;
+  ch.SubType = SubTypeUserPhrase;
+  ch.FormatType = FormatTypeNatural;
+  ch.Required = true;
+
+  defineChallenge(cred, ch);
+
+  ch.Name = "sample1";
+  ch.Prompt = "sample1";
+  ch.Value = "sample1";
+  ch.Required = false;
+
+  defineChallenge(cred, ch);
+
+  ch.Name = "sample2";
+  ch.Prompt = "sample2";
+  ch.Value = "sample2";
+
+  defineChallenge(cred, ch);
+
+  ch.Name = "sample3";
+  ch.Prompt = "sample3";
+  ch.Value = "sample3";
+
+  defineChallenge(cred, ch);
+
+  ch.Name = "sample4";
+  ch.Prompt = "sample4";
+  ch.Value = "sample4";
+
+  defineChallenge(cred, ch);
+}
+
+/**
+ * Called prior to actual user authentication.  This gives the
+ * owner a chance to setup global elements.
+ */
+rule Authentication::setup()
+{
+  depends on rule commonSetup(success);
+}
+
+/**
+ * This routine is called whenever a user is tested for authenticity.  This
+ * routine will continue to be called until the following occurs:
+ *
+ *    o StatusAuthorized is the authorization status.  The current user is
+ *      now authorized to access the UXP and its data base on the
+ *      designated privileges
+ *
+ *    o StatusNotAuthorized is the authorization status.  The current user
+ *      is denied access and the UXP engine exits.
+ *
+ * All other authorization status values are interpreted as challenges to
+ * the current user to prove identity.
+ *
+ * Prior to returning, the routine should call the setAuthorization
+ * routine to indicate authentication status and assigned privileges.
+ */
+rule Authentication::main()
+{
+  /* These rules execute one time */
+
+  depends on rule Authentication::checkReadOnly(Success);
+  depends on rule Authentication::complianceCheck(Success);
+  depends on rule Authentication::scheduleCheck(Success);
+  depends on rule Authentication::locationCheck(Success);
+
+  /* These rules execute upon entry and return */
+
+  on entry Authentication::checkFailures();
+  on return Authentication::checkFailures();
+
+  /* Find the user credential.  If found, UxpCredential is set.
+   *
+   * The return status will contain one or more status bits set.  For
+   * that reason, we must loop through the bits to determine which
+   * status conditions must be addressed for the next authentication pass.
+   */
+
+  int i, status = validateUser();
+
+  for (i = 1; i <= StatusBitMax; i++)
+  {
+    switch (bitTest(status, i))
+    {
+      case 0:
+        break;
+
+      case StatusAuthorized:
+        setAuthorization(StatusAuthorized, UxpCredential.Privileges);
+        return;
+    }
+  }
+
+  addRandomChallenge(2);
+  setAuthorization(StatusChallenged, AccessNone);
+
+  return;
+}
+
+/**
+ * Checks session and total failure counts
+ */
+rule Authentication::checkFailures()
+{
+  if (TotalFailureCount >= 99)
+  {
+    logFailure("SmartFile object shredded and destroyed due to attack");
+
+    return (error);
+  }
+
+  if (SessionFailureCount >= 3)
+  {
+    logFailure("SmartFile object access rejected due to excessive incorrect responses");
+
+    return (error);
+  }
+
+  return (noaction);
+}
+
+/**
+ * Rule to check compliance independent of the user
+ */
+rule Authentication::complianceCheck()
+{
+  return (success);
+}
+
+/**
+ * Rule to check if uxp is read-only
+ */
+rule Authentication::checkReadOnly()
+{
+#ifdef READONLY
+  if (ReadOnly)
+  {
+    logFailure("SmartFile object is read-only and cannot be opened.");
+
+    return (error);
+  }
+#endif
+
+  return (success);
+}
+
+/**
+ * Rule to check a schedule independent of the user
+ */
+rule Authentication::scheduleCheck()
+{
+  return (success);
+}
+
+/**
+ * Rule to check device/location independent of the user
+ */
+rule Authentication::locationCheck()
+{
+  return (success);
+}
+
+/**
+ * This rule is used to check compliance for the object
+ *
+ */
+rule Compliance::main()
+{
+  ComplianceExpirationDate = toDate("01/10/2099 00:00");
+
+  return (success);
+}
+
+/**
+ * This routine is called whenever a virtual file is access.
+ */
+rule Authentication::fileAccess()
+{
+  CurrentVirtualFileAccess = AccessUnlimited;
+
+  return;
+}
+
+/**
+ * A common routine to setup global elements.
+ */
+rule commonSetup()
+{
+  MasterKey = "AZC745jjSjsee23400LLosdIIUSmD";
+  MaximumIdleTime = 300;
+  ExternalChallengeLength = 7;
+  IgnoreCase = true;
+  EventOptions = EventFailure | EventAccess | EventLocal | EventExternal;
+  EventSecureKey = "JAifjsE4#$JSjjL361WWQsisjjsifui09iiii";
+  AlertOptions = 0;
+
+  EmailReplyTo = "noreply@Sertainty.com";
+  EmailServer = "smtp.gmail.com";
+  EmailPort = 587;
+  EmailSecurity = "TLS";
+  EmailAuthentication = true;
+
+  EmailSenderName = "SmartFile";
+  EmailUser = "noreply@Sertainty.com";
+  EmailPwd = "xxxxxxxxx";
+
+  SMSService = "None";
+  SMSUser = "";
+  SMSPwd = "";
+
+  return (success);
+}
+
+/**
+ * Gets the security algorithm for crypto work
+ */
+rule preferredAlgorithm()
+{
+  SecurityAlgorithm = "AES256_GCM12";
+}
+
+/**
+ * Logs a failure and sends email
+ */
+procedure logFailure(message)
+{
+  string buf = concat(message, ": ", toString(today()), " (UTC)");
+  setErrorMessage(message);
+
+  setAuthorization(StatusNotAuthorized, AccessNone, buf);
+}

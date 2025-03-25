@@ -1,0 +1,994 @@
+/*! \copyright SertintyONE Corporation, 2016.  All Rights Reserved.
+
+\file     sample.kcl
+
+\details  Sample key code source
+
+\author   gsmith
+\date     1/01/2012
+*/
+
+/**
+ * Called by UXP when the user wishes to initialize object structures
+ * from fixed settings within this file.
+ */
+rule NewAppliance::setup()
+{
+  depends on rule commonSetup(success);
+
+  /* Add common configuration definitions */
+
+  ConfigType config;
+
+  /* Define the credentials */
+
+  CredentialType user;
+  ChallengeType ch;
+
+  clear(user);
+  clear(ch);
+  user.Name = "Steven Sample";
+  user.Email = "SampleUser@myemail.com";
+  user.TimeLow = 0;
+  user.TimeHigh = 60;
+  user.DataMask = "0";
+  user.ValidationType = ValidationLocal;
+  user.SuperUser = false;
+  user.Privileges = AccessUnlimited;
+  user.Schedule.Enabled = true;
+  user.Schedule.Saturday = true;
+  user.Schedule.Sunday = true;
+  user.Schedule.Monday = true;
+  user.Schedule.Tuesday = true;
+  user.Schedule.Wednesday = true;
+  user.Schedule.Thursday = true;
+  user.Schedule.Friday = true;
+  user.Schedule.StartMinute = -1;
+  user.Schedule.StartHour = -1;
+  user.Schedule.StartDay = -1;
+  user.Schedule.StartMonth = -1;
+  user.Schedule.StartYear = -1;
+  user.Schedule.EndMinute = -1;
+  user.Schedule.EndHour = -1;
+  user.Schedule.EndDay = -1;
+  user.Schedule.EndMonth = -1;
+  user.Schedule.EndYear = -1;
+
+  defineCredential(user);
+
+  ch.Name = "USERNAME";
+  ch.Prompt = "Username";
+  ch.Value = "SampleUser@myemail.com";
+  ch.TimeHigh = 10;
+  ch.SubType = SubTypeUserPhrase;
+  ch.DataType = DataTypeString;
+  ch.Required = true;
+
+  defineChallenge(user, ch);
+
+  ch.Name = ch.Prompt = "Challenge 1";
+  ch.Value = "Response 1";
+  ch.DataType = DataTypeString;
+  ch.TimeHigh = 60;
+  ch.UseDataMask = true;
+  ch.Required = false;
+
+  defineChallenge(user, ch);
+
+  ch.Name = ch.Prompt = "Challenge 2";
+  ch.Value = "Response 2";
+
+  defineChallenge(user, ch);
+
+  ch.Name = ch.Prompt = "Challenge 3";
+  ch.Value = "Response 3";
+
+  defineChallenge(user, ch);
+
+  ch.Name = ch.Prompt = "Challenge 4";
+  ch.Value = "Response 4";
+
+  defineChallenge(user, ch);
+
+  ch.Name = ch.Prompt = "Challenge 5";
+  ch.Value = "Response 5";
+
+  defineChallenge(user, ch);
+
+  ch.Name = ch.Prompt = "Challenge 6";
+  ch.Value = "Response 6";
+
+  defineChallenge(user, ch);
+
+  ch.Name = ch.Prompt = "Challenge 7";
+  ch.Value = "Response 7";
+
+  defineChallenge(user, ch);
+
+  ch.Name = ch.Prompt = "Challenge 8";
+  ch.Value = "Response 8";
+
+  defineChallenge(user, ch);
+
+  ch.Name = "Challenge 9";
+  ch.Prompt = "Challenge 9";
+  ch.Value = "Response 9";
+
+  defineChallenge(user, ch);
+
+  ch.Name = ch.Prompt = "Challenge 10";
+  ch.Value = "Response 10";
+
+  defineChallenge(user, ch);
+}
+
+/**
+ * Called prior to actual user authentication.  This gives the
+ * owner a chance to setup global elements.
+ */
+rule Authentication::setup()
+{
+  depends on rule commonSetup(success);
+}
+
+/**
+ * This routine is called whenever a user is tested for authenticity.  This
+ * routine will continue to be called until the following occurs:
+ *
+ *    o StatusAuthorized is the authorization status.  The current user is
+ *      now authorized to access the UXP and its data base on the
+ *      designated privileges
+ *
+ *    o StatusNotAuthorized is the authorization status.  The current user
+ *      is denied access and the UXP engine exits.
+ *
+ * All other authorization status values are interpreted as challenges to
+ * the current user to prove identity.
+ *
+ * Prior to returning, the routine should call the setAuthorization
+ * routine to indicate authentication status and assigned privileges.
+ */
+rule Authentication::main()
+{
+  depends on rule Authentication::checkGlobalRestrictions(success);
+
+  /* These rules execute upon entry and return */
+
+  on entry Authentication::checkFailures();
+  on return Authentication::checkFailures();
+
+  int tmpInt, globalSchedViolated;
+
+  /* Find the user credential.  If found, UxpCredential is set.
+   *
+   * The return status will contain one or more status bits set.  For
+   * that reason, we must loop through the bits to determine which
+   * status conditions must be addressed for the next authentication pass.
+   */
+
+  int i, status = validateUser();
+
+  /* User expiration */
+
+  if (UserExpiration && (UserExpiration <= today()))
+  {
+    logFailure(errormsg1);
+
+    return;
+  }
+
+  /* Global schedule */
+
+  if (true && isScheduleViolation(GlobalSchedule))
+  {
+    status |= StatusGlobalSchedViolation;
+  }
+
+  if (UxpFileId != CurrentFileId)
+  {
+    status |= StatusFileMoved;
+  }
+
+  /* Minimum number of challenges on top of trust challenges */
+
+  addRandomChallenge(MinChallengeCount);
+
+  for (i = 1; i <= StatusBitMax; i++)
+  {
+    switch (bitTest(status, i))
+    {
+      case StatusAuthorized:
+        if (Reality != "Public")
+        {
+          setReality(Reality);
+
+          if (!realityExists(Reality))
+          {
+            logFailure(errormsg1);
+          }
+          else
+          {
+            if (Reality != DefReality)
+              setAuthorization(StatusAuthorized, AccessRead | AccessNoRealities);
+            else
+            {
+              addConfiguration();
+              setAuthorization(StatusAuthorized, UxpCredential.Privileges | AccessNoRealities);
+            }
+          }
+        }
+        else
+        {
+          addConfiguration();
+          setAuthorization(StatusAuthorized, UxpCredential.Privileges);
+        }
+
+        releaseVariables();
+        return;
+
+        /* Invalid username entered */
+
+      case StatusInvalidUsername:
+        return;
+
+      /* UXP moved */
+
+      case StatusFileMoved:
+        if (false)
+        {
+          logFailure(errormsg1);
+
+          return;
+        }
+
+        if (false)
+        {
+          logFailure(errormsg1);
+
+          destroy();
+
+          return;
+        }
+
+        if (false)
+        {
+          Reality = "";
+        }
+
+       
+       addRandomChallenge(0);
+       break;
+
+      /* Global schedule violation */
+
+      case StatusGlobalSchedViolation:
+        if (false)
+        {
+          logFailure(errormsg1);
+
+          return;
+        }
+
+        if (false)
+        {
+          logFailure(errormsg1);
+
+          destroy();
+
+          return;
+        }
+
+        if (false)
+        {
+          Reality = "";
+        }
+
+        
+        addRandomChallenge(0);
+        break;
+
+      /* Schedule violation */
+
+      case StatusScheduleViolation:
+        if (false)
+        {
+          logFailure(errormsg1);
+
+          return;
+        }
+
+        if (false)
+        {
+          logFailure(errormsg1);
+
+          destroy();
+
+          return;
+        }
+
+        if (false)
+        {
+          Reality = "";
+        }
+
+        
+        addRandomChallenge(0);
+        break;
+
+      /* Neither the device nor the location was recognized */
+
+      case StatusConfigNotFound:
+        /* If deny ... */
+
+        if (false)
+        {
+          logFailure(errormsg1);
+
+          return;
+        }
+
+        /* If destroy ... */
+
+        if (false)
+        {
+          logFailure(errormsg1);
+
+          destroy();
+
+          return;
+        }
+
+        /* Alternate reality ... */
+
+        if (false)
+        {
+          Reality = "";
+        }
+
+        
+        addRandomChallenge(0);
+        break;
+
+      /* Device was recognized, but the location was not */
+
+      case StatusLocationNotFound:
+        /* If deny ... */
+
+        if (false)
+        {
+          logFailure(errormsg1);
+
+          return;
+        }
+
+        /* If destroy ... */
+
+        if (false)
+        {
+          logFailure(errormsg1);
+
+          destroy();
+
+          return;
+        }
+
+        /* Alternate reality ... */
+
+        if (false)
+        {
+          Reality = "";
+        }
+
+        
+        addRandomChallenge(0);
+        break;
+
+      /* Location recognized, device was not */
+
+      case StatusDeviceNotFound:
+        /* If deny ... */
+
+        if (false)
+        {
+          logFailure(errormsg1);
+
+          return;
+        }
+
+        /* If destroy ... */
+
+        if (false)
+        {
+          logFailure(errormsg1);
+
+          destroy();
+
+          return;
+        }
+
+        /* Alternate reality ... */
+
+        if (false)
+        {
+          Reality = "";
+        }
+
+        
+        addRandomChallenge(0);
+        break;
+
+      /* Device and location recognized, but not at the same time. */
+
+      case StatusDeviceLocationFound:
+        /* If deny ... */
+
+        if (false)
+        {
+          logFailure(errormsg1);
+
+          return;
+        }
+
+        /* If destroy ... */
+
+        if (false)
+        {
+          logFailure(errormsg1);
+
+          destroy();
+
+          return;
+        }
+
+        /* Alternate reality ... */
+
+        if (false)
+        {
+          Reality = "";
+        }
+
+        
+        addRandomChallenge(0);
+        break;
+
+      case StatusThreat:
+        sendSMS(AlertSMSAddress, "Alert: Threat detection", 1);
+        sendEmail(AlertEmailAddress, "Alert: Threat detection",
+                concat("Threat detected: ", toString(today()), " (UTC)"));
+
+        setReality("$$Threat");
+
+        if (!realityExists("$$Threat"))
+        {
+          logFailure(errormsg1);
+        }
+        else
+        {
+          setAuthorization(StatusAuthorized, AccessRead|AccessNoRealities);
+        }
+        return;
+
+      case StatusPanic:
+        sendSMS(PanicSMSAddress, "Alert: Panic", 1);
+        sendEmail(PanicEmailAddress, "Alert: Panic",
+                concat("Panic: ", toString(today()), " (UTC)"));
+
+        setReality("Panic");
+
+        if (!realityExists("Panic"))
+        {
+          logFailure(errormsg1);
+        }
+        else
+        {
+          setAuthorization(StatusAuthorized, AccessRead|AccessNoRealities);
+        }
+        return;
+    }
+  }
+
+  /* Check for trusted elements */
+
+  if (!TrustedTime)
+  {
+    
+    addRandomChallenge(0);
+  }
+
+  if (!TrustedSystem)
+  {
+    
+    addRandomChallenge(0);
+  }
+
+  if (ReadOnly)
+  {
+    
+    addRandomChallenge(0);
+  }
+
+  /* Add challenges equal to the current session failure count */
+
+  addRandomChallenge(SessionFailureCount);
+
+  addChallengeList(AuthApprovals);
+  setAuthorization(StatusChallenged, AccessNone);
+
+  return;
+}
+
+/**
+ * Checks session and total failure counts
+ */
+rule Authentication::checkFailures()
+{
+  if (999 && (TotalFailureCount >= 999))
+  {
+    logFailure(errormsg1);
+
+    destroy();
+
+    return (error);
+  }
+
+  if (3 && (SessionFailureCount >= 3))
+  {
+    logFailure(errormsg1);
+
+    return (error);
+  }
+
+  return (noaction);
+}
+
+/**
+ * Rule to check if uxp has any global restrictions
+ */
+rule Authentication::checkGlobalRestrictions()
+{
+  if (ReadOnly && false)
+  {
+    logFailure(errormsg1);
+
+    return (error);
+  }
+
+  if (!TrustedTime)
+  {
+    /* Deny */
+
+    if (false)
+    {
+      logFailure(errormsg1);
+
+      return (error);
+    }
+
+    if (false)
+    {
+      logFailure(errormsg1);
+
+      destroy();
+
+      return (error);
+    }
+  }
+
+  if (!TrustedSystem)
+  {
+    /* Deny */
+
+    if (false)
+    {
+      logFailure(errormsg1);
+
+      return (error);
+    }
+
+    if (false)
+    {
+      logFailure(errormsg1);
+
+      destroy();
+
+      return (error);
+    }
+  }
+
+  /* Compliance check */
+
+  if (today() > ComplianceExpirationDate)
+  {
+    logFailure(concat("UXP has expired as of ",
+               ComplianceExpirationDate, " and will be destroyed."));
+
+    destroy();
+
+    return (error);
+  }
+
+  /* Check for maximum accesses */
+
+  if (0 && (AccessCount >= 0))
+  {
+    logFailure(errormsg1);
+
+    return (error);
+  }
+
+  return (success);
+}
+
+/**
+ * This rule is used to check compliance for the object
+ *
+ */
+rule Compliance::main()
+{
+  depends on rule commonSetup(success);
+
+  if (today() > ComplianceExpirationDate)
+  {
+    logFailure(concat("UXP has expired as of ",
+               ComplianceExpirationDate, " and will be destroyed."));
+
+    destroy();
+
+    return (error);
+  }
+
+  return (success);
+}
+
+/**
+ * This rule is touch the object long enough to check global rules
+ *
+ */
+rule Touch::main()
+{
+  depends on rule commonSetup(success);
+
+  if (true && isScheduleViolation(GlobalSchedule))
+  {
+    if (false || false)
+    {
+      logFailure(errormsg1);
+
+      return (error);
+    }
+  }
+
+  if (!hasConfiguration(true, 1))
+  {
+    if (false || false)
+    {
+      logFailure(errormsg1);
+
+      return (error);
+    }
+  }
+
+  if (!hasConfiguration(true, 2))
+  {
+    if (false || false)
+    {
+      logFailure(errormsg1);
+
+      return (error);
+    }
+  }
+
+  if (!hasConfiguration(true, 3))
+  {
+    if (false || false)
+    {
+      logFailure(errormsg1);
+
+      return (error);
+    }
+  }
+
+  if (UxpFileId != CurrentFileId)
+  {
+    if (false || false)
+    {
+      logFailure(errormsg1);
+
+      return (error);
+    }
+  }
+
+  if (!TrustedTime)
+  {
+    if (false || false)
+    {
+      logFailure(errormsg1);
+
+      return (error);
+    }
+  }
+
+  if (!TrustedSystem)
+  {
+    if (false || false)
+    {
+      logFailure(errormsg1);
+
+      return (error);
+    }
+  }
+
+  releaseVariables();
+
+  return (success);
+}
+
+/**
+ * This routine is called whenever a virtual file is accessed.
+ */
+rule Authentication::fileAccess()
+{
+  int flags = getFileFlags(CurrentVirtualFile);
+
+  /* Check for no access or invalid time window */
+
+  if (flags & 16640)
+  {
+    CurrentVirtualFileAccess = AccessNone;
+
+    return;
+  }
+
+  /* Signature */
+
+  if (flags & 32768)
+  {
+    string username = getFileSignature(CurrentVirtualFile);
+
+    if (!hasSignature(username, "", ""))
+    {
+      CurrentVirtualFileAccess = AccessNone;
+
+      return;
+    }
+  }
+
+  /* Check for UXP movement */
+
+  if (UxpFileId != CurrentFileId)
+  {
+    if (flags & 8192)
+    {
+      CurrentVirtualFileAccess = AccessNone;
+
+      return;
+    }
+  }
+
+  CurrentVirtualFileAccess = AccessUnlimited;
+
+  /* Send an alert */
+
+  if (CurrentFileAction != "Directory")
+  {
+    string buf;
+
+    if (flags & 32)
+    {
+      buf = concat("Virtual file '", CurrentVirtualFile, "' accessed ",
+                   CurrentFileAction, ": ", toString(today()), " (UTC)");
+
+      sendSMS(AlertSMSAddress, concat("UXP Alert: ", buf), 1);
+    }
+
+    if (flags & 64)
+    {
+      buf = concat("Virtual file '", CurrentVirtualFile, "' accessed ",
+                   CurrentFileAction, ": ", toString(today()), " (UTC)");
+
+      sendEmail(AlertEmailAddress, "Alert: UXP virtual file accessed", buf);
+    }
+  }
+
+  return;
+}
+
+/**
+ * Sets up environment for specific user
+ */
+rule Authentication::userSetup()
+{
+  depends on data lastUsername != CurrentUsername
+  {
+    on nomatch
+    {
+      return(success);
+    }
+  }
+
+  clearList(AddressApprovals);
+  clearList(DeviceApprovals);
+  clearList(LocationApprovals);
+  clearList(ScheduleApprovals);
+  clearList(GlobalScheduleApprovals);
+  clearList(AuthApprovals);
+  clearList(UntrustedSysApprovals);
+  clearList(MovementApprovals);
+  clearList(UntrustedTimeApprovals);
+  clearList(ReadOnlyApprovals);
+
+  
+
+  switch (CurrentUsername)
+  {
+    case "SampleUser@myemail.com":
+      IgnoreCase = true;
+      IgnoreCharacters = "";
+      AdvancedThreatDetection = true;
+      AllowedMisses = 0;
+      AllowedMissesThreshold = 6;
+      PanicWord = "";
+      PanicEmailAddress = "";
+      PanicSMSAddress = "";
+      MinChallengeCount = 3;
+      UserExpiration = toDate("08/07/2118 19:00");
+      DefReality = Reality = "Public";
+      break;
+
+
+    default:
+      AllowedMisses = 0;
+      AllowedMissesThreshold = 6;
+      AdvancedThreatDetection = true;
+      IgnoreCase = true;
+      IgnoreCharacters = "";
+      UserExpiration = today() + 1;
+      Reality = DefReality = "Public";
+      break;
+  }
+
+  lastUsername = CurrentUsername;
+}
+
+/**
+ * Releases the variables set up for the user
+ */
+procedure releaseVariables()
+{
+  release variable lastUsername;
+
+  release variable UserExpiration;
+
+  release variable GlobalSchedule;
+
+  release variable AddressApprovals;
+  release variable DeviceApprovals;
+  release variable LocationApprovals;
+  release variable ScheduleApprovals;
+  release variable GlobalScheduleApprovals;
+  release variable AuthApprovals;
+  release variable UntrustedSysApprovals;
+  release variable MovementApprovals;
+  release variable UntrustedTimeApprovals;
+  release variable ReadOnlyApprovals;
+  release variable Reality;
+  release variable DefReality;
+
+  release variable errormsg1;
+}
+
+/**
+ * Define variables used by the designer
+ */
+rule globalVariables()
+{
+  depends on data !variableExists(lastUsername);
+
+  /* Variables used by rules */
+
+  permanent string lastUsername = "-999";
+  permanent date UserExpiration;
+
+  permanent ScheduleType GlobalSchedule;
+
+  permanent list AddressApprovals, DeviceApprovals;
+  permanent list LocationApprovals, ScheduleApprovals, GlobalScheduleApprovals;
+  permanent list AuthApprovals, UntrustedSysApprovals;
+  permanent list MovementApprovals, UntrustedTimeApprovals, ReadOnlyApprovals;
+  permanent string Reality, DefReality;
+
+  GlobalSchedule.Enabled = true;
+  GlobalSchedule.Saturday = true;
+  GlobalSchedule.Sunday = true;
+  GlobalSchedule.Monday = true;
+  GlobalSchedule.Tuesday = true;
+  GlobalSchedule.Wednesday = true;
+  GlobalSchedule.Thursday = true;
+  GlobalSchedule.Friday = true;
+  GlobalSchedule.StartMinute = -1;
+  GlobalSchedule.StartHour = -1;
+  GlobalSchedule.StartDay = -1;
+  GlobalSchedule.StartMonth = -1;
+  GlobalSchedule.StartYear = -1;
+  GlobalSchedule.EndMinute = -1;
+  GlobalSchedule.EndHour = -1;
+  GlobalSchedule.EndDay = -1;
+  GlobalSchedule.EndMonth = -1;
+  GlobalSchedule.EndYear = -1;
+
+
+  permanent string errormsg1 = "UXP access denied at this time.  Please try again later.";
+
+  return success;
+}
+
+/**
+ * A common routine to setup global elements.
+ */
+rule commonSetup()
+{
+  depends on rule globalVariables(Success, NoAction);
+
+  /* Variables defined by the UXP system */
+
+  ComplianceExpirationDate = toDate("07/23/2118 19:00");
+
+  IsWorkflow = false;
+  MasterKey = "a set of random characters";
+  EnableDebugging = false;
+  UseLocalTime = false;
+
+  MaximumIdleTime = 600;
+  ExternalChallengeLength = 6;
+
+  EmailReplyTo = "sertainty.messenger@sertainty.com";
+  EmailServer = "email-smtp.us-east-1.amazonaws.com";
+  EmailPort = 587;
+  EmailSecurity = "TLS";
+  EmailAuthentication = true;
+  EmailSenderName = "Sample";
+
+  EmailUser = "AKIAJDLYJS5V4QTOMIJQ";
+  EmailPwd = "Aob/28jEA+DxKuRHas4lQZZhZmNhANBu7Op3I3uawcIh";
+
+  SMSService = "Email";
+  SMSUser = "";
+  SMSPwd = "";
+
+  EventOptions = EventFailure | EventAccess | EventLocal;
+  EventSecureKey = "";
+  EventEmailAddress = "";
+  EventSmsAddress = "";
+  EventURL = "";
+  EventFileSpec = "";
+  EventFtpURL = "";
+
+  AlertOptions = AlertDevice|AlertLocation|AlertEmail;
+  AlertEmailAddress = "";
+  AlertSMSAddress = "";
+
+  return (success);
+}
+
+/**
+ * Gets the security algorithm for crypto work
+ */
+rule preferredAlgorithm()
+{
+  SecurityAlgorithm = "AES256_GCM12";
+}
+
+/**
+ * Logs a failure and sends email
+ */
+procedure logFailure(message)
+{
+  string buf = concat(message, ": ", toString(today()), " (UTC)");
+
+  setErrorMessage(message);
+
+  sendEmail(AlertEmailAddress, "Alert: UXP access failure", buf);
+  sendSMS(AlertSMSAddress, concat("UXP Alert: ", message), 1);
+
+  setAuthorization(StatusNotAuthorized, AccessNone, message);
+}
