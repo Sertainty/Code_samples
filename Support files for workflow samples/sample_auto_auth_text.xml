@@ -1,0 +1,36 @@
+<!-- SertaintyString -s sample_auto_auth_text.xml -o sample_auto_auth_text.msg -c sample_auto_auth_text.c -i sample_auto_auth_text.h -d Sample -r -f sample_auto_text_init --k1 {fys6fKStwSS7Xngp}f]ks*hg{{fjhWQ --k2 yasdmYsfj53jqjfjfhhhf65mnVZZssf7 --k3 4 --k4 8 -->
+
+<TextBundle>
+  <Text key="SAMPLE_T_CH0">$]R9R8&amp;V![,7S;&lt;VOWTOM%+KQLJEI,NNC5K76OS%[HRDAK--NP</Text>
+  <Text key="SAMPLE_T_RS0">85-S]P@PE[&lt;NRF:^-^B#C%9CZZ&lt;EK+U-;6&amp;PR2RBP-#AO*!VV#</Text>
+
+  <Text key="SAMPLE_T_CH1">4.6D2WXVDR?&amp;H2F/&gt;N0:Y_N-+I_%[@%VC!KVW,P?:79F4D7K#4</Text>
+  <Text key="SAMPLE_T_RS1">-^25]6KZ!BW#0M&gt;LK5K9M/$K,WX0@R-&lt;+&gt;YR4+#ITR5IN^QKF3</Text>
+
+  <Text key="SAMPLE_T_CH2">;2*&lt;H5JCJ5##A[L,97S@-.P-FU54,H58W3L&amp;?F[YJHG&lt;LP/P/Q</Text>
+  <Text key="SAMPLE_T_RS2">0C8/*&gt;%R6ATHYAYDH33QQKF9&amp;QW34&lt;.!/ULJ$I4Y-I.29[QXSZ</Text>
+
+  <Text key="SAMPLE_T_CH3">&lt;3VPA?%_4__08Q7$EXN@TAU/0W5&amp;A/%L&lt;O@X&gt;8DTHXY.9TNC@5</Text>
+  <Text key="SAMPLE_T_RS3">^E/Q^ZI[3:N!ATL5G]!3FAJH?$S_-U&amp;Y6.X#8.!038WVGZD/O;</Text>
+
+  <Text key="SAMPLE_T_CH4">&lt;6LTNE@DSK*V2]/_[@!W:&gt;:NEWXI/S[A[IN:[]+T5&lt;&gt;&amp;%TO*A&gt;</Text>
+  <Text key="SAMPLE_T_RS4">0J:VH.PX%,!EO+R3^M@4[L;K/V3W&lt;ZHA.&amp;+YWM3PY9Y.%KA&gt;F_</Text>
+
+  <Text key="SAMPLE_T_CH5">?[N3YP8!$82GYWN;Z*$$7E7*Q#9TF_#-*VE[&gt;4+C?/O&gt;DPZ5O6</Text>
+  <Text key="SAMPLE_T_RS5">%LTS7FQP#8-U:&amp;W&amp;52W_5]%!K&lt;$H:/XW:X*&gt;,?6-IOE2._L#O&amp;</Text>
+
+  <Text key="SAMPLE_T_CH6">IT&lt;6VJ+94FDSASDEM_VNGAZM]SX0YP!RP,%W%E7A.0&amp;8^A,$+#</Text>
+  <Text key="SAMPLE_T_RS6">ZZ/&lt;ESLYF8;9MKS3VR.AX_QNHMUN&gt;X43Y85;;#;BGPG0.@;,PN</Text>
+
+  <Text key="SAMPLE_T_CH7">V8I?8RWA9^&gt;NQXK%/R9JJ!3/D[7-H$$IVP&lt;CW4[EG]9CNYJ.O$</Text>
+  <Text key="SAMPLE_T_RS7">!LT-B8E,^K^&amp;[Z6BBWN$,R!$PGH&lt;!47KJ3X.X,C,I,R?-K#&amp;BK</Text>
+
+  <Text key="SAMPLE_T_CH8">V_-&gt;H2.RG@#TB.BA#A&gt;$_R&gt;7P$M/W5GO]-^K2V#^93!#FNEULO</Text>
+  <Text key="SAMPLE_T_RS8">?[3_0DM*ZK#$]!&amp;3:*G7UIF$F[*D&gt;2UR^+KGIPFQY9!Q47KZQ7</Text>
+
+  <Text key="SAMPLE_T_CH9">_A99:&gt;G3SI7RF5PI?#ZS%5Z*UM-6G$A9/7QH*JF-FA9TU@XI;;</Text>
+  <Text key="SAMPLE_T_RS9">WRV2[S,H:0[SK*:#@#PJ+.!!ZE5/_E?O06RJ9][Z65KGT53X?5</Text>
+
+  <Text key="SAMPLE_T_USER">sfs992lAJ8sdfjjttwwe{3j1sfj!safleff</Text>
+
+</TextBundle>

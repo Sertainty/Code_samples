@@ -1,0 +1,302 @@
+<?xml version="1.0"?>
+<!---->
+<!-- ID Definition: Application4098256733 -->
+<!---->
+<!-- Date: 2020-03-31T10:51:00 -->
+<!---->
+<ID name="Application4098256733">
+  <Description type="string">Application identity</Description>
+  <Expiration type="date">2119-03-30T19:00:00</Expiration>
+  <PersonalName1 type="string"></PersonalName1>
+  <PersonalName2 type="string"></PersonalName2>
+  <PersonalName3 type="string"></PersonalName3>
+  <Address1 type="string"></Address1>
+  <Address2 type="string"></Address2>
+  <City type="string"></City>
+  <State type="string"></State>
+  <Zipcode type="string"></Zipcode>
+  <Phone1 type="string"></Phone1>
+  <PhoneType1 type="string"></PhoneType1>
+  <Phone2 type="string"></Phone2>
+  <PhoneType2 type="string"></PhoneType2>
+  <Phone3 type="string"></Phone3>
+  <PhoneType3 type="string"></PhoneType3>
+  <Photo type="string"></Photo>
+  <Privileges type="string">Files</Privileges>
+  <!---->
+  <Rules>
+    <Rule name="GeneralSetup">
+      <AdvancedDataLogging type="bool">false</AdvancedDataLogging>
+      <AlternateReality type="string"></AlternateReality>
+      <Compliance type="int">36523</Compliance>
+      <MaximumAccesses type="int">0</MaximumAccesses>
+      <MaximumCycleFailures type="int">3</MaximumCycleFailures>
+      <MaximumIdleTime type="int">600</MaximumIdleTime>
+      <MaximumTotalFailures type="int">999</MaximumTotalFailures>
+      <UseLocalTime type="bool">false</UseLocalTime>
+      <Workflow type="bool">true</Workflow>
+    </Rule>
+    <!---->
+    <Rule name="RestrictionsSetup">
+      <ConfigurationAltReality type="bool">false</ConfigurationAltReality>
+      <ConfigurationApproval type="bool">false</ConfigurationApproval>
+      <ConfigurationDeny type="bool">false</ConfigurationDeny>
+      <ConfigurationDestroy type="bool">false</ConfigurationDestroy>
+      <ConfigurationPrompts type="int">0</ConfigurationPrompts>
+      <EveryAuthenticationApproval type="bool">false</EveryAuthenticationApproval>
+      <EveryAuthenticationPrompts type="int">1</EveryAuthenticationPrompts>
+      <HardwareAltReality type="bool">false</HardwareAltReality>
+      <HardwareApproval type="bool">false</HardwareApproval>
+      <HardwareDeny type="bool">false</HardwareDeny>
+      <HardwareDestroy type="bool">false</HardwareDestroy>
+      <HardwarePrompts type="int">0</HardwarePrompts>
+      <MovementAltReality type="bool">false</MovementAltReality>
+      <MovementApproval type="bool">false</MovementApproval>
+      <MovementDeny type="bool">false</MovementDeny>
+      <MovementDestroy type="bool">false</MovementDestroy>
+      <MovementPrompts type="int">0</MovementPrompts>
+      <NetworkAltReality type="bool">false</NetworkAltReality>
+      <NetworkApproval type="bool">false</NetworkApproval>
+      <NetworkDeny type="bool">false</NetworkDeny>
+      <NetworkDestroy type="bool">false</NetworkDestroy>
+      <NetworkPrompts type="int">0</NetworkPrompts>
+      <Preset type="string"></Preset>
+      <ReadOnlyAltReality type="bool">false</ReadOnlyAltReality>
+      <ReadOnlyApproval type="bool">false</ReadOnlyApproval>
+      <ReadOnlyDeny type="bool">false</ReadOnlyDeny>
+      <ReadOnlyPrompts type="int">0</ReadOnlyPrompts>
+      <ScheduleAltReality type="bool">false</ScheduleAltReality>
+      <ScheduleApproval type="bool">false</ScheduleApproval>
+      <ScheduleDeny type="bool">false</ScheduleDeny>
+      <ScheduleDestroy type="bool">false</ScheduleDestroy>
+      <SchedulePrompts type="int">0</SchedulePrompts>
+      <UntrustedSystemAltReality type="bool">false</UntrustedSystemAltReality>
+      <UntrustedSystemApproval type="bool">false</UntrustedSystemApproval>
+      <UntrustedSystemDeny type="bool">false</UntrustedSystemDeny>
+      <UntrustedSystemDestroy type="bool">false</UntrustedSystemDestroy>
+      <UntrustedSystemPrompts type="int">0</UntrustedSystemPrompts>
+      <UntrustedTimeAltReality type="bool">false</UntrustedTimeAltReality>
+      <UntrustedTimeApproval type="bool">false</UntrustedTimeApproval>
+      <UntrustedTimeDeny type="bool">false</UntrustedTimeDeny>
+      <UntrustedTimeDestroy type="bool">false</UntrustedTimeDestroy>
+      <UntrustedTimePrompts type="int">0</UntrustedTimePrompts>
+    </Rule>
+    <!---->
+    <Rule name="ConfigurationSetup">
+      <Configurations />
+    </Rule>
+    <!---->
+    <Rule name="AlertSetup">
+      <EmailAddress type="string"></EmailAddress>
+      <IncludeDevice type="bool">true</IncludeDevice>
+      <IncludeLicense type="bool">false</IncludeLicense>
+      <IncludeLocation type="bool">true</IncludeLocation>
+      <SMSAddress type="string"></SMSAddress>
+      <UseEmail type="bool">true</UseEmail>
+      <UseSMS type="bool">false</UseSMS>
+    </Rule>
+    <!---->
+    <Rule name="ApprovalSetup">
+      <ExternalLength type="int">6</ExternalLength>
+    </Rule>
+    <!---->
+    <Rule name="EventSetup">
+      <EmailAddress type="string"></EmailAddress>
+      <ExternalKey type="string">!MM[$CY;&gt;S,$!OO;7B#MYG6#W#7KN?T.</ExternalKey>
+      <FileSpec type="string"></FileSpec>
+      <FtpURL type="string"></FtpURL>
+      <LogAccesses type="bool">false</LogAccesses>
+      <LogFailures type="bool">false</LogFailures>
+      <LogMessages type="bool">false</LogMessages>
+      <LogRepeats type="bool">false</LogRepeats>
+      <RecordEmail type="bool">false</RecordEmail>
+      <RecordExternal type="bool">false</RecordExternal>
+      <RecordFile type="bool">false</RecordFile>
+      <RecordFtp type="bool">false</RecordFtp>
+      <RecordLocal type="bool">false</RecordLocal>
+      <RecordRemote type="bool">false</RecordRemote>
+      <RecordSMS type="bool">false</RecordSMS>
+      <RemoteURL type="string"></RemoteURL>
+      <SMSAddress type="string"></SMSAddress>
+    </Rule>
+    <!---->
+    <Rule name="ScheduleSetup">
+      <Enabled type="bool">false</Enabled>
+      <DaySunday type="bool">true</DaySunday>
+      <DayMonday type="bool">true</DayMonday>
+      <DayTuesday type="bool">true</DayTuesday>
+      <DayWednesday type="bool">true</DayWednesday>
+      <DayThursday type="bool">true</DayThursday>
+      <DayFriday type="bool">true</DayFriday>
+      <DaySaturday type="bool">true</DaySaturday>
+      <StartDay type="int">-1</StartDay>
+      <StartHour type="int">-1</StartHour>
+      <StartMinute type="int">-1</StartMinute>
+      <StartMonth type="int">-1</StartMonth>
+      <StartYear type="int">-1</StartYear>
+      <EndDay type="int">-1</EndDay>
+      <EndHour type="int">-1</EndHour>
+      <EndMinute type="int">-1</EndMinute>
+      <EndMonth type="int">-1</EndMonth>
+      <EndYear type="int">-1</EndYear>
+    </Rule>
+  </Rules>
+  <!---->
+  <Users>
+    <User name="sfs992lAJ8sdfjjttwwe{3j1sfj!safleff" type="Machine">
+      <Enabled type="bool">true</Enabled>
+      <Email type="string">noreply@sertainty.com</Email>
+      <Expiration type="date">2119-03-30T19:00:00</Expiration>
+      <FormalName type="string">Machine4098256733</FormalName>
+      <Privileges type="string">Read,Write,Delete,Print,Copy,Sign,ReadEvents,Owner,ReadSignature</Privileges>
+      <!---->
+      <Private>
+        <Workflow type="bool">false</Workflow>
+        <Masking type="string">0</Masking>
+        <!---->
+        <Rules>
+          <Rule name="UserAdvancedSetup">
+            <MaximumTime type="int">60</MaximumTime>
+            <MaximumTotalTime type="int">60</MaximumTotalTime>
+            <MinimumTime type="int">0</MinimumTime>
+            <MinimumTotalTime type="int">0</MinimumTotalTime>
+          </Rule>
+          <!---->
+          <Rule name="UserBasicSetup">
+            <IgnoreCase type="bool">true</IgnoreCase>
+            <IgnoreChars type="string"></IgnoreChars>
+            <MinimumPrompts type="int">3</MinimumPrompts>
+          </Rule>
+          <!---->
+          <Rule name="UserRecoverySetup">
+            <MaximumFailures type="int">0</MaximumFailures>
+            <MinimumCorrect type="int">6</MinimumCorrect>
+          </Rule>
+        </Rules>
+        <!---->
+        <Challenges>
+          <Challenge name="$]R9R8&amp;V![,7S;&lt;VOWTOM%+KQLJEI,NNC5K76OS%[HRDAK--NP">
+            <Enabled type="bool">true</Enabled>
+            <Hashed type="bool">false</Hashed>
+            <Prompt type="string">$]R9R8&amp;V![,7S;&lt;VOWTOM%+KQLJEI,NNC5K76OS%[HRDAK--NP</Prompt>
+            <Required type="bool">true</Required>
+            <Response type="string">85-S]P@PE[&lt;NRF:^-^B#C%9CZZ&lt;EK+U-;6&amp;PR2RBP-#AO*!VV#</Response>
+            <Softkb type="bool">false</Softkb>
+          </Challenge>
+          <!---->
+          <Challenge name="4.6D2WXVDR?&amp;H2F/&gt;N0:Y_N-+I_%[@%VC!KVW,P?:79F4D7K#4">
+            <Enabled type="bool">true</Enabled>
+            <Hashed type="bool">false</Hashed>
+            <Prompt type="string">4.6D2WXVDR?&amp;H2F/&gt;N0:Y_N-+I_%[@%VC!KVW,P?:79F4D7K#4</Prompt>
+            <Required type="bool">true</Required>
+            <Response type="string">-^25]6KZ!BW#0M&gt;LK5K9M/$K,WX0@R-&lt;+&gt;YR4+#ITR5IN^QKF3</Response>
+            <Softkb type="bool">false</Softkb>
+          </Challenge>
+          <!---->
+          <Challenge name=";2*&lt;H5JCJ5##A[L,97S@-.P-FU54,H58W3L&amp;?F[YJHG&lt;LP/P/Q">
+            <Enabled type="bool">true</Enabled>
+            <Hashed type="bool">false</Hashed>
+            <Prompt type="string">;2*&lt;H5JCJ5##A[L,97S@-.P-FU54,H58W3L&amp;?F[YJHG&lt;LP/P/Q</Prompt>
+            <Required type="bool">true</Required>
+            <Response type="string">0C8/*&gt;%R6ATHYAYDH33QQKF9&amp;QW34&lt;.!/ULJ$I4Y-I.29[QXSZ</Response>
+            <Softkb type="bool">false</Softkb>
+          </Challenge>
+          <!---->
+          <Challenge name="&lt;3VPA?%_4__08Q7$EXN@TAU/0W5&amp;A/%L&lt;O@X&gt;8DTHXY.9TNC@5">
+            <Enabled type="bool">true</Enabled>
+            <Hashed type="bool">false</Hashed>
+            <Prompt type="string">&lt;3VPA?%_4__08Q7$EXN@TAU/0W5&amp;A/%L&lt;O@X&gt;8DTHXY.9TNC@5</Prompt>
+            <Required type="bool">true</Required>
+            <Response type="string">^E/Q^ZI[3:N!ATL5G]!3FAJH?$S_-U&amp;Y6.X#8.!038WVGZD/O;</Response>
+            <Softkb type="bool">false</Softkb>
+          </Challenge>
+          <!---->
+          <Challenge name="&lt;6LTNE@DSK*V2]/_[@!W:&gt;:NEWXI/S[A[IN:[]+T5&lt;&gt;&amp;%TO*A&gt;">
+            <Enabled type="bool">true</Enabled>
+            <Hashed type="bool">false</Hashed>
+            <Prompt type="string">&lt;6LTNE@DSK*V2]/_[@!W:&gt;:NEWXI/S[A[IN:[]+T5&lt;&gt;&amp;%TO*A&gt;</Prompt>
+            <Required type="bool">true</Required>
+            <Response type="string">0J:VH.PX%,!EO+R3^M@4[L;K/V3W&lt;ZHA.&amp;+YWM3PY9Y.%KA&gt;F_</Response>
+            <Softkb type="bool">false</Softkb>
+          </Challenge>
+          <!---->
+          <Challenge name="?[N3YP8!$82GYWN;Z*$$7E7*Q#9TF_#-*VE[&gt;4+C?/O&gt;DPZ5O6">
+            <Enabled type="bool">true</Enabled>
+            <Hashed type="bool">false</Hashed>
+            <Prompt type="string">?[N3YP8!$82GYWN;Z*$$7E7*Q#9TF_#-*VE[&gt;4+C?/O&gt;DPZ5O6</Prompt>
+            <Required type="bool">true</Required>
+            <Response type="string">%LTS7FQP#8-U:&amp;W&amp;52W_5]%!K&lt;$H:/XW:X*&gt;,?6-IOE2._L#O&amp;</Response>
+            <Softkb type="bool">false</Softkb>
+          </Challenge>
+          <!---->
+          <Challenge name="IT&lt;6VJ+94FDSASDEM_VNGAZM]SX0YP!RP,%W%E7A.0&amp;8^A,$+#">
+            <Enabled type="bool">true</Enabled>
+            <Hashed type="bool">false</Hashed>
+            <Prompt type="string">IT&lt;6VJ+94FDSASDEM_VNGAZM]SX0YP!RP,%W%E7A.0&amp;8^A,$+#</Prompt>
+            <Required type="bool">true</Required>
+            <Response type="string">ZZ/&lt;ESLYF8;9MKS3VR.AX_QNHMUN&gt;X43Y85;;#;BGPG0.@;,PN</Response>
+            <Softkb type="bool">false</Softkb>
+          </Challenge>
+          <!---->
+          <Challenge name="V8I?8RWA9^&gt;NQXK%/R9JJ!3/D[7-H$$IVP&lt;CW4[EG]9CNYJ.O$">
+            <Enabled type="bool">true</Enabled>
+            <Hashed type="bool">false</Hashed>
+            <Prompt type="string">V8I?8RWA9^&gt;NQXK%/R9JJ!3/D[7-H$$IVP&lt;CW4[EG]9CNYJ.O$</Prompt>
+            <Required type="bool">true</Required>
+            <Response type="string">!LT-B8E,^K^&amp;[Z6BBWN$,R!$PGH&lt;!47KJ3X.X,C,I,R?-K#&amp;BK</Response>
+            <Softkb type="bool">false</Softkb>
+          </Challenge>
+          <!---->
+          <Challenge name="V_-&gt;H2.RG@#TB.BA#A&gt;$_R&gt;7P$M/W5GO]-^K2V#^93!#FNEULO">
+            <Enabled type="bool">true</Enabled>
+            <Hashed type="bool">false</Hashed>
+            <Prompt type="string">V_-&gt;H2.RG@#TB.BA#A&gt;$_R&gt;7P$M/W5GO]-^K2V#^93!#FNEULO</Prompt>
+            <Required type="bool">true</Required>
+            <Response type="string">?[3_0DM*ZK#$]!&amp;3:*G7UIF$F[*D&gt;2UR^+KGIPFQY9!Q47KZQ7</Response>
+            <Softkb type="bool">false</Softkb>
+          </Challenge>
+          <!---->
+          <Challenge name="_A99:&gt;G3SI7RF5PI?#ZS%5Z*UM-6G$A9/7QH*JF-FA9TU@XI;;">
+            <Enabled type="bool">true</Enabled>
+            <Hashed type="bool">false</Hashed>
+            <Prompt type="string">_A99:&gt;G3SI7RF5PI?#ZS%5Z*UM-6G$A9/7QH*JF-FA9TU@XI;;</Prompt>
+            <Required type="bool">true</Required>
+            <Response type="string">WRV2[S,H:0[SK*:#@#PJ+.!!ZE5/_E?O06RJ9][Z65KGT53X?5</Response>
+            <Softkb type="bool">false</Softkb>
+          </Challenge>
+        </Challenges>
+      </Private>
+      <!---->
+      <Rules>
+        <Rule name="ConfigurationSetup">
+          <Configurations />
+        </Rule>
+        <!---->
+        <Rule name="ApprovalSetup">
+          <ExternalLength type="int">6</ExternalLength>
+        </Rule>
+        <!---->
+        <Rule name="ScheduleSetup">
+          <Enabled type="bool">false</Enabled>
+          <DaySunday type="bool">true</DaySunday>
+          <DayMonday type="bool">true</DayMonday>
+          <DayTuesday type="bool">true</DayTuesday>
+          <DayWednesday type="bool">true</DayWednesday>
+          <DayThursday type="bool">true</DayThursday>
+          <DayFriday type="bool">true</DayFriday>
+          <DaySaturday type="bool">true</DaySaturday>
+          <StartDay type="int">-1</StartDay>
+          <StartHour type="int">-1</StartHour>
+          <StartMinute type="int">-1</StartMinute>
+          <StartMonth type="int">-1</StartMonth>
+          <StartYear type="int">-1</StartYear>
+          <EndDay type="int">-1</EndDay>
+          <EndHour type="int">-1</EndHour>
+          <EndMinute type="int">-1</EndMinute>
+          <EndMonth type="int">-1</EndMonth>
+          <EndYear type="int">-1</EndYear>
+        </Rule>
+      </Rules>
+    </User>
+  </Users>
+</ID>
