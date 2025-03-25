@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Sertainty Android Sample</string>
+    <string name="library_not_initialized">Not initialized</string>
+    <string name="library_initialized">Initialized</string>
+    <string name="library_failed">Failed to initialize</string>
+    <string name="success">Success</string>
+    <string name="failure">Failure</string>
+</resources>
