@@ -129,6 +129,15 @@ given back to the system and the authentication loop continues until a resolutio
 - This sample demonstrates how to create a UXP Object using a UXP Identity and add data files into the created UXP Object.
 - using C, C++ and C# language interfaces; and uxl scripting
 
+### uxp_sql
+- Sertainty sample workflow using UXP as a SQL db and native C++ language interface.  Uses XML to create ID.
+  - (1) Creates ID from xml
+  - (2) Creates UXP from ID
+  - (3) Creates SQL tables within UXP object
+  - (4) Close / Re-opens UXP
+  - (5) Accesses SQL / data
+- using C, C++ language interfaces
+  
 ## for UXL script only
 
 ### 1-Delegate_create_mySql
