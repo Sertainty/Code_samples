@@ -34,14 +34,35 @@ given back to the system and the authentication loop continues until a resolutio
 ### samples_config
 - Sample program interface that demonstrates fetching current machine's location information using the Sertainty SDK. Similarly, machine's network interface information can also be fetched from the machine's configuration. This sample only demonstrates location information for brevity - using C, C++ and C# language interfaces; and uxl scripting
   
-## sample_workflow_auto_auth
+### sample_workflow_auto_auth
 - Demonstrates a mini workflow, resulting in automatic UXP authentication/ SSO;
   - (1) create ID from XML
   - (2) Create UXP from ID & adds data
   - (3) Closes the UXP
   - (4) Auto authenticates success / fail
   - (5) on success, extracts the data
-  - (6) closes UXP 
+  - (6) closes UXP
+- using C, C++ and C# language interfaces
+
+### sample_workflow_create_id_uxp_open
+- Demonstrates a mini workflow, resulting in UXP authentication and data extraction
+  - (1) create ID from XML
+  - (2) Create UXP from ID & adds data
+  - (3) Closes the UXP
+  - (4) Authenticates success / fail
+  - (5) on success, extracts the data
+  - (6) closes UXP
+- using C, C++ and C# language interfaces
+
+### sample_workflow_kcl
+- Sample program using native C++ language interface.  Uses KCL to create ID
+  - (1) create ID from XML
+  - (2) Create UXP from ID & adds data
+  - (3) Closes the UXP
+  - (4) Authenticates success / fail
+  - (5) on success, extracts the data
+  - (6) closes UXP
+- using C,and  C++ language interfaces
 
 ## for UXL script only
 
