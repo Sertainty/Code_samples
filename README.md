@@ -6,7 +6,7 @@ The Sertainty code samples are organized by languagge as well as function. In so
 
 # Code Sample Descriptions
 
-## for C, C++, C#
+## for C, C++, C#, UXL script
 
 ### Bytearrays
 - Demonstrates the use of uxl ByteArray which is a Sertainty Data Structure that is used to handle binary and ascii data.
@@ -24,12 +24,40 @@ The Sertainty code samples are organized by languagge as well as function. In so
 - Having to individually authenticate into multiple UXP Objects is time-consuming. Also time-consuming is authenticating into a single UXP Object multiple times. As a convenience, a UXP Identity can be used for a Single Sign- On session. A Single Sign-On session allows automatic authentication into UXP Objects that were created using that same UXP Identity.
 - For authentication, there are two approaches to programmatically seeking authorization. The first approach is to declare a function callback that is called when the system presents challenges. The callback function is given the list of challenges that it must process and return. The callback function is called until resolution is reached.
 - The second uses a looping process to allow the program to handle the challenge list manually. Responses are then
-given back to the system and the authentication loop continues until a resolution is reached.
+given back to the system and the authentication loop continues until a resolution is reached - using C, C++ and C# language interfaces; and uxl scripting
 
+### open_uxp_auth
+- Demonstrates how to open and interactively authenticate a UXP file using known challenge/response pairs and read contents of virtual files protected within a UXP file - using C, C++ and C# language interfaces; and uxl scripting
+
+### 
+  
 ## 
 
-## for UXL script
+## for UXL script only
 
-### 1-Delegate_create_db
-  - c, c++,c#, uxl
-    - This sample demonstrates how to create a new Data Services Database using an existing ID that will be designated as the DB owner ID. The DataServices db stores and manages Delegate IDs, Users and Delegate subscribers.
+### 1-Delegate_create_mySql
+  - This sample code creates a new mySql Database - using uxl scripting
+  - Application expects to find the necessary source files in the current working folder.   
+   
+### 1-delegate_create_uxpSql
+- This sample code creates a new uxpSql Database - using uxl scripting
+- Application expects to find the necessary source files in the current working folder.
+
+### 2-delegate_open_session
+- This sample allows you to open an existing DS Database and authenticate into it to create a DS Session - using uxl scripting
+
+### 3-delegate_set-server
+
+### 4-delegate_add_users
+
+### 5-delegate_add_delegates
+
+### 6-delegate_add_suscribers
+
+### 7-delegate_info
+
+### export
+
+
+
+
