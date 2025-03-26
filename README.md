@@ -41,8 +41,20 @@ given back to the system and the authentication loop continues until a resolutio
 ### samples_config
 - Sample program interface that demonstrates fetching current machine's location information using the Sertainty SDK. Similarly, machine's network interface information can also be fetched from the machine's configuration. This sample only demonstrates location information for brevity - using C, C++ and C# language interfaces; and uxl scripting
 
-### sample_id
-- 
+### sample_delegate
+- Sertainty delegate management sample program
+- Uses XML to create ID.### sample_id
+  - Sets up Services db
+  - Creates ID from xml for admin to DB
+  - Creates 2nd user ID from XML
+  - Creates a subscription to the delegate ID using user 2
+  - Creates UXP using Delegate ID
+  - Adds data
+  - Closes UXP
+  - Opens UXP
+  - Authenticates as User2
+  - On success data is extracted
+- using native C++ language interface
 
 ### sample_kcl
 
