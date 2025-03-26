@@ -29,9 +29,19 @@ given back to the system and the authentication loop continues until a resolutio
 ### open_uxp_auth
 - Demonstrates how to open and interactively authenticate a UXP file using known challenge/response pairs and read contents of virtual files protected within a UXP file - using C, C++ and C# language interfaces; and uxl scripting
 
-### 
+### sample_auto_text
+
+### samples_config
+- Sample program interface that demonstrates fetching current machine's location information using the Sertainty SDK. Similarly, machine's network interface information can also be fetched from the machine's configuration. This sample only demonstrates location information for brevity - using C, C++ and C# language interfaces; and uxl scripting
   
-## 
+## sample_workflow_auto_auth
+- Demonstrates a mini workflow, resulting in automatic UXP authentication/ SSO;
+  - (1) create ID from XML
+  - (2) Create UXP from ID & adds data
+  - (3) Closes the UXP
+  - (4) Auto authenticates success / fail
+  - (5) on success, extracts the data
+  - (6) closes UXP 
 
 ## for UXL script only
 
@@ -57,6 +67,12 @@ given back to the system and the authentication loop continues until a resolutio
 ### 7-delegate_info
 
 ### export
+
+### id_from_xml-V2
+
+### open_uxp_auth-v2id
+
+### sample_workflow_delegate
 
 
 
