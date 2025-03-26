@@ -137,6 +137,15 @@ given back to the system and the authentication loop continues until a resolutio
   - (4) Close / Re-opens UXP
   - (5) Accesses SQL / data
 - using C, C++ language interfaces
+
+### webservice.cs
+- WebService represents the connection to the Sertainty Data Services Web Service.
+  - In order to construct a WebService object, you need:
+    - a valid URL to Sertainty Data Services Web Service
+     - an encryption key which is has been pre set on the Data Services database using ds::setAccessCode call.
+    - A WebService object also holds the Session identifier which is set automatically once a valid session is open.
+    - The Session identifier uniquely identifies each client connection made to the Data Services Web Service.
+  - Using C#
   
 ## for UXL script only
 
