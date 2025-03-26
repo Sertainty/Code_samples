@@ -1,4 +1,4 @@
-# In Progress...
+# Code Samples
 
 The Sertainty code samples are organized by languagge as well as function. In some cases the functionally focused samples are included in the language folder and supporting files folders.
 
@@ -62,7 +62,14 @@ given back to the system and the authentication loop continues until a resolutio
   - (4) Authenticates success / fail
   - (5) on success, extracts the data
   - (6) closes UXP
-- using C,and  C++ language interfaces
+- using C,and C++ language interfaces
+
+### sample_workflow_sm
+- Sertainty SmartMessage sample program using native C++ language interface. Uses XML to create ID. New ID is used as a single sign-on object. SmartMessage created linking ID.
+- A UXP SmartMessage requires authentication of the prospective user. Access will only be granted after a successful authentication.  The process of authentication can be tedious if a user accesses multiple UXP objects or the same UXP object multiple times. As a convenience, a Sertainty ID can be used as a single sign-on session, which will automatically authenticate UXP objects / SmartMessages that were created using the ID.
+- For authentication, there are two approaches to programmatically seeking authorization. The first approach is to declare a function callback that is called when the system presents challenges.  The callback function is given the list of challenges that it must process and return. The callback function is called until resolution is reached.
+- The second uses a looping process to allow the program to handle the challenge list manually. Responses are then given back to the system and the authentication loop continues until a resolution is reached.
+- using C,and C++ language interfaces
 
 ## for UXL script only
 
