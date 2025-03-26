@@ -40,7 +40,18 @@ given back to the system and the authentication loop continues until a resolutio
 
 ### samples_config
 - Sample program interface that demonstrates fetching current machine's location information using the Sertainty SDK. Similarly, machine's network interface information can also be fetched from the machine's configuration. This sample only demonstrates location information for brevity - using C, C++ and C# language interfaces; and uxl scripting
-  
+
+### sample_id
+- 
+
+### sample_kcl
+
+### sample_sm
+
+### sample_sql
+
+### sasmple_sso
+
 ### sample_workflow_auto_auth
 - Demonstrates a mini workflow, resulting in automatic UXP authentication/ SSO;
   - (1) create ID from XML
@@ -105,30 +116,60 @@ given back to the system and the authentication loop continues until a resolutio
 - This sample allows you to open an existing DS Database and authenticate into it to create a DS Session - using uxl scripting
 
 ### 3-delegate_set-server
+- This sample code opens the newly created database and sets the Server, Accesscode and the Trusted Paths.
 
 ### 4-delegate_add_users
+- This sample code opens the newly created database and adds the Users and User IDs.
 
 ### 5-delegate_add_delegates
+- This sample code opens the newly created database and adds the Delegates.
 
 ### 6-delegate_add_suscribers
-
+- This sample code opens the newly created database and adds the Subscribers.
+  
 ### 7-delegate_info
-
+- This sample code tests all the UXL methods that have to do with a Delegate's Journals, Sytem Flags, Access Codes, and more.
+  
 ### export
+- This sample shows how to extract a document from a UXP.
 
 ### id_from_xml-V2
 - This program shows how you can create a UXP file using a Sertainty Version 2 ID.
 - Adds data files into the created UXP Object.
 
 ### open_uxp_auth-v2id
-
+- This sample shows how to open and interactively authenticate a UXP Object using known prompt/response pairs and read contents of virtual files protected within a UXP Object.
+  
 ### sample_workflow_delegate
-
+- Demonstrates the features of a UXP Sertainty Services database using UXL scripting.
+  - Sertainty Services database is a UXP Object that permits SQL access. The database is used to manage Users and Delegate Identities.
+  - A Delegate can be used to allow a User to access a UXP Object without having an identity embedded within the UXP Object.
+  - Access is still controlled by the data owner, but is managed via the Sertainty Services database utilized by Delegate Service.
+  - To work propertly, the current working Delegate should be the example data folder.
+  
 ### uxp_events
+- Demonstrates the features of a UXP recording events at a Sertainty Services.
+  - Creates a sample ID that will record events to a Sertainty Services server.
+  - Creates the Sertainty Services database and registers the sample ID in order to accept events.
+  - Selects event records from the Sertainty Services database.
 
 ### webservices_uxp
+- Demonstrates the ability to test UXP functionality by calling Sertainty Web Services from UXL.
+  - Opens an existing services database.
+  - Expects server access code to be 01234567890123456789012345678901.
+  - Creates UXP
+  - Adds data to the UXP
+  - Reads virtual file and writes out to copy1.pdf
+  - Closes UXP
+  - Re-Opens UXP
+  - Extracts file from UXP
+  - Closes UXP
 
 ### webservice
+- Demonstrates the ability to call Sertainty Web Services from UXL.
+  - Opens an existing services database.
+  - Selects items from the database.
+  - Expects server access code to be 01234567890123456789012345678901.
 
 
 
