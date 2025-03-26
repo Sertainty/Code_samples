@@ -71,6 +71,19 @@ given back to the system and the authentication loop continues until a resolutio
 - The second uses a looping process to allow the program to handle the challenge list manually. Responses are then given back to the system and the authentication loop continues until a resolution is reached.
 - using C,and C++ language interfaces
 
+### sample_workflow_sql
+- Sertainty sample workflow using UXP as a SQL db and native C++ language interface.  Uses XML to create ID.
+  - (1) Creates ID from xml
+  - (2) Creates UXP from ID
+  - (3) Creates SQL tables within UXP object
+  - (4) Close / Re-opens UXP
+  - (5) Accesses SQL / data
+- using C, C++, and SQL language interfaces, and uxl scripting
+ 
+### uxp_from_id
+- This sample demonstrates how to create a UXP Object using a UXP Identity and add data files into the created UXP Object.
+- using C, C++ and C# language interfaces; and uxl scripting
+
 ## for UXL script only
 
 ### 1-Delegate_create_mySql
@@ -97,6 +110,8 @@ given back to the system and the authentication loop continues until a resolutio
 ### export
 
 ### id_from_xml-V2
+- This program shows how you can create a UXP file using a Sertainty Version 2 ID.
+- Adds data files into the created UXP Object.
 
 ### open_uxp_auth-v2id
 
