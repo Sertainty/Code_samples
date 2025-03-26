@@ -75,7 +75,7 @@ given back to the system and the authentication loop continues until a resolutio
 - Sertainty sample program. Uses XML to create ID.
 - using SQL, C amd native C++ language interface
 
-### sasmple_sso
+### sample_sso
 - Sertainty single sign-on sample program. Uses XML to create ID.  New ID is used as a single sign-on object.
 - using C, C++ language interfaces
 
