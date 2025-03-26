@@ -56,13 +56,28 @@ given back to the system and the authentication loop continues until a resolutio
   - On success data is extracted
 - using native C++ language interface
 
+### sample_id
+- Sertainty sample program;  Uses XML to create ID.
+- using C, C++ and C# language interfaces
+
 ### sample_kcl
+- Sertainty sample program;  Uses KCL to create ID.
+- using C, C++ language interfaces
 
 ### sample_sm
+- Sertainty SmartMessage sample program. Uses XML to create ID. New ID is used as a single sign-on object. SmartMessage created linking ID.
+- A UXP SmartMessage requires authentication of the prospective user. Access will only be granted after a successful authentication.  The process of authentication can be tedious if a user accesses multiple UXP objects or the same UXP object multiple times. As a convenience, a Sertainty ID can be used as a single sign-on session, which will automatically authenticate UXP objects / SmartMessages that were created using the ID.
+- For authentication, there are two approaches to programmatically seeking authorization. The first approach is to declare a function callback that is called when the system presents challenges.  The callback function is given the list of challenges that it must process and return. The callback function is called until resolution is reached.
+- The second uses a looping process to allow the program to handle the challenge list manually. Responses are then given back to the system and the authentication loop continues until a resolution is reached.
+- using C,and C++ language interfaces
 
 ### sample_sql
+- Sertainty sample program. Uses XML to create ID.
+- using SQL, C amd native C++ language interface
 
 ### sasmple_sso
+- Sertainty single sign-on sample program. Uses XML to create ID.  New ID is used as a single sign-on object.
+- using C, C++ language interfaces
 
 ### sample_workflow_auto_auth
 - Demonstrates a mini workflow, resulting in automatic UXP authentication/ SSO;
@@ -95,7 +110,7 @@ given back to the system and the authentication loop continues until a resolutio
 - using C,and C++ language interfaces
 
 ### sample_workflow_sm
-- Sertainty SmartMessage sample program using native C++ language interface. Uses XML to create ID. New ID is used as a single sign-on object. SmartMessage created linking ID.
+- Sertainty SmartMessage sample program. Uses XML to create ID. New ID is used as a single sign-on object. SmartMessage created linking ID.
 - A UXP SmartMessage requires authentication of the prospective user. Access will only be granted after a successful authentication.  The process of authentication can be tedious if a user accesses multiple UXP objects or the same UXP object multiple times. As a convenience, a Sertainty ID can be used as a single sign-on session, which will automatically authenticate UXP objects / SmartMessages that were created using the ID.
 - For authentication, there are two approaches to programmatically seeking authorization. The first approach is to declare a function callback that is called when the system presents challenges.  The callback function is given the list of challenges that it must process and return. The callback function is called until resolution is reached.
 - The second uses a looping process to allow the program to handle the challenge list manually. Responses are then given back to the system and the authentication loop continues until a resolution is reached.
