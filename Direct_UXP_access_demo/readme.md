@@ -23,7 +23,7 @@ The base Workflow.data contains 501 records.  By utilizing a multiplier, one can
 set that is 'N' times larger than the original sample.  For example, by using a multiplier of 2, the
 resultant sample set will contain 1002 records.
 
-1. To get started, run the SmartFile Script Engine.
+1. To get started, run the SertaintyScript utility.
 2. At the prompt, type: x::cd("the folder containing the above workflow demo files");
 3. To create protected data, at the prompt, type: @WorkflowCreate.uxl
 4. To run the application, at the prompt, type: @WorkflowRun.uxl
