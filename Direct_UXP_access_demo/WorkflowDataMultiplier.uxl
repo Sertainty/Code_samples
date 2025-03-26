@@ -1,0 +1,32 @@
+/* Workflow test - creates a sample file for testing clear data access
+
+   Run this procedure to create a test file.
+*/
+
+replace procedure create()
+{
+  int sz, mult;
+  string mult_str, vname = "Workflow.data";
+  string outname = "WorkflowClear.data";
+  printf("\nWorkflow Sample Data Multiplier\n\n");
+
+  printf("The multiplier directs the engine to replicate the same input\n");
+  printf("data 'N' times, thus, producing a desired sample size.  The current\n");
+  printf("source file contains 501 records, so multiplying by 2 would\n");
+  printf("create 1002 records.\n\n");
+
+  mult_str = x::prompt("Data multiplier <1>? ", "1");
+  mult = mult_str;
+
+  printf("\nCreating %1\n", outname);
+
+  startStats();
+
+  sz = x::createFileForTest(vname, outname, "replace", mult);
+
+  printf("\nSample data has %1 clear records\n", 501 * mult);
+
+  showStats();
+}
+
+create();

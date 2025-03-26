@@ -1,0 +1,153 @@
+/* Workflow Benchmark */
+
+replace procedure testWorkflow()
+{
+  int start,end, target, tmptarget;
+  bytearray buf;
+  string tmp, recbuf, mult_str;
+  int maxsize, maxfetch, tmpmult, handle;
+  int newcache, silent, i, sf, mult, fsize = 888824;
+  string opt, vname = "$(SAMPLE)/8-WorkflowDemo/Workflow.data";
+  printf("\nWorkflow Test\n\n");
+  int sample, cachesize, pagesize;
+  ValuePair v;
+  list attributes;
+  on return
+    {
+      sf::closeUxp(sf);
+    }
+
+  printf("The multiplier directs the engine to replicate the same input\n");
+  printf("data 'N' times, thus, producing a desired sample size.  The current\n");
+  printf("source file contains 501 records, so multiplying by 2 would\n");
+  printf("create 1002 records.\n");
+
+  for (;;)
+  {
+    printf("\nSetting up new UXP\n\n");
+    mult_str = x::prompt("Data multiplier <Exit>? ", "EXIT");
+    if (toupper(mult_str) == "EXIT")
+      break;
+
+    mult = mult_str;
+    mult_str = x::prompt("Default page size <1000>? ", "1000");
+    pagesize = mult_str;
+    mult_str = x::prompt("Default cache size <0>? ", "0");
+    cachesize = mult_str;
+    mult_str = x::prompt("Compressed <False>? ", "False");
+    if (toupper(mult_str) == "FALSE")
+      opt = "";
+    else
+      opt = "Compress";
+
+    printf("\nCreating UXP\n");
+
+    sf = sf::newUxp("$(SAMPLE)/8-WorkflowDemo/Workflow.uxp",
+                    "$(SAMPLE)/8-WorkflowDemo/Workflow.kcl",
+                    "KclFile|Replace");
+    if (sf <= 0)
+    {
+      printf("\n*** Error: %1\n", errorstring);
+      continue;
+    }
+
+    maxsize = sf::addFileForTest(sf, vname, vname, pagesize, cachesize, mult, opt);
+    sf::setAttribute(sf, "NAME", "Workflow Test");
+    sf::setAttribute(sf, "DESCRIPTION", "Tests a workflow UXP for data access");
+
+    sf::showAttributes(sf);
+
+    sf::getFileInfo(sf, vname, &attributes);
+
+    printf("\n");
+    
+    for (i = 0; i < countList(attributes); i++)
+    {
+      v = getList(attributes, i);
+      
+      printf("%1: %2\n", v.name, v.value);
+    }
+    
+    handle = sf::openFile(sf, vname);
+
+    for (;;)
+    {
+      silent = false;
+      
+      printf("\n");
+      recbuf = x::prompt("Number of reads <Back>? ", "Back");
+      if (toupper(recbuf) == "BACK")
+        break;
+
+      sample = recbuf;
+
+      recbuf = x::prompt("Maximum buffer size <500>? ", "500");
+      maxfetch = recbuf;
+      if (maxfetch <= 0)
+        continue;
+        
+      newcache = cachesize;
+      
+      tmp = concat("Cache size <", cachesize, ">? ");
+      
+      recbuf = x::prompt(tmp, cachesize);
+      newcache = recbuf;
+      if (newcache == -1)
+        newcache = cachesize;
+        
+      sf::setCacheSize(sf, handle, newcache);
+      
+      recbuf = x::prompt("Show progress <True>? ", "true");
+      silent = (toupper(recbuf) == "FALSE");
+        
+      newcache = cachesize;
+
+      /* Random sampling */
+      
+      startStats();
+      
+      for (i = 1; i <= sample; i++)
+      {
+        start = rnd(1, maxsize - maxfetch);
+
+        if (!silent)
+          printf("Read: %1  Offset: %2   %3\n", i, start, start + maxfetch);
+  
+        sf::seekFile(sf, handle, start);
+        if (errorstring)
+         {
+           printf("\n*** Error: %1\n", errorstring);
+           break;
+         }
+        sf::readFile(sf, handle, &buf, maxfetch);
+        if (errorstring)
+        {
+          printf("Error: %1\n");
+          break;
+        }
+      }
+        
+      showStats();
+    }
+      
+    sf::closeFile(sf, handle);
+    
+    /* Try an export */
+
+    printf("\nTesting export ... %1 bytes\n", maxsize);
+    
+    startStats();
+
+    sf::exportFile(sf, vname, "$(SAMPLE)/temp/tmp.export", "replace");
+    
+    printf("\n");
+    
+    showStats();
+    
+    sf::closeUxp(sf);
+
+    printf("\nClosing UXP\n");
+  }
+}
+
+testWorkflow();
