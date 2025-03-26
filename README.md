@@ -29,6 +29,13 @@ given back to the system and the authentication loop continues until a resolutio
 ### open_uxp_auth
 - Demonstrates how to open and interactively authenticate a UXP file using known challenge/response pairs and read contents of virtual files protected within a UXP file - using C, C++ and C# language interfaces; and uxl scripting
 
+### sample.cpp
+- Sertainty sample creates uxp object from kcl file
+- using C++
+  - ### sample.kcl
+    - See sample.cpp
+    - Sample creates identity from ; KCL file
+
 ### sample_auto_text
 
 ### samples_config
@@ -116,6 +123,12 @@ given back to the system and the authentication loop continues until a resolutio
 ### open_uxp_auth-v2id
 
 ### sample_workflow_delegate
+
+### uxp_events
+
+### webservices_uxp
+
+### webservice
 
 
 
