@@ -6,9 +6,7 @@ The Sertainty code samples are organized by languagge as well as function. In so
 
 # 
 
-# Code Sample Descriptions
-
-## for C, C++, C#, UXL script
+## Code Sample Descriptions for C, C++, C#, UXL script
 
 ### Bytearrays
 - Demonstrates the use of uxl ByteArray which is a Sertainty Data Structure that is used to handle binary and ascii data.
